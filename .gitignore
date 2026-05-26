@@ -1,5 +1,5 @@
 node_modules/
 dist/
-server/.env
+test-results/
 .env
-*.local
+.env.local
