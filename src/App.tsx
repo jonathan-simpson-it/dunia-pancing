@@ -18,6 +18,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminAddProduct from './pages/AdminAddProduct'
 import AdminImport from './pages/AdminImport'
 import AdminRevenue from './pages/AdminRevenue'
+import AdminOrders from './pages/AdminOrders'
 import Account from './pages/Account'
 import Contact from './pages/Contact'
 
@@ -44,6 +45,7 @@ export default function App() {
                       <Route path="/admin/add" element={<ProtectedRoute role="admin"><AdminAddProduct /></ProtectedRoute>} />
                       <Route path="/admin/import" element={<ProtectedRoute role="admin"><AdminImport /></ProtectedRoute>} />
                       <Route path="/admin/revenue" element={<ProtectedRoute role="admin"><AdminRevenue /></ProtectedRoute>} />
+                      <Route path="/admin/orders" element={<ProtectedRoute role="admin"><AdminOrders /></ProtectedRoute>} />
                       <Route path="/account" element={<ProtectedRoute role="client"><Account /></ProtectedRoute>} />
                       <Route path="/contact" element={<Contact />} />
                     </Routes>

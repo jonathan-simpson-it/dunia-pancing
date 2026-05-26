@@ -1,4 +1,4 @@
-import type { Order, OrderItem, Customer, ShippingInfo, PaymentInfo, ShippingOption, PaymentOption } from '../types'
+import type { Order, OrderItem, Customer, ShippingInfo, PaymentInfo, ShippingOption, PaymentOption, OrderStatus, LogisticsInfo, StatusHistoryEntry } from '../types'
 
 const STORAGE_KEY = 'dunia-pancing-orders'
 let orderCounter: number | null = null
@@ -41,6 +41,7 @@ interface CreateOrderInput {
 export function createOrder({ items, subtotal, customer, shipping, payment }: CreateOrderInput): Order {
   const { id } = getNextId()
   const now = new Date().toISOString()
+  const initialHistory: StatusHistoryEntry = { status: 'waiting_payment', timestamp: now }
   const order: Order = {
     id,
     date: now,
@@ -59,6 +60,7 @@ export function createOrder({ items, subtotal, customer, shipping, payment }: Cr
     subtotal,
     shipping_fee: shipping.fee,
     total: subtotal + shipping.fee,
+    statusHistory: [initialHistory],
   }
 
   const orders = loadOrders()
@@ -265,6 +267,209 @@ ${order.customer.notes ? `<div class="note"><strong>Catatan Pelanggan:</strong> 
   printWindow.document.close()
   printWindow.focus()
   setTimeout(() => printWindow.print(), 500)
+}
+
+function saveOrders(orders: Order[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders))
+  } catch { /* noop */ }
+}
+
+function pushStatusHistory(order: Order, status: OrderStatus, note?: string): void {
+  order.statusHistory.push({ status, timestamp: new Date().toISOString(), note })
+}
+
+export function updateOrderStatus(orderId: string, newStatus: OrderStatus, note?: string): Order | null {
+  const orders = loadOrders()
+  const idx = orders.findIndex(o => o.id === orderId)
+  if (idx === -1) return null
+  orders[idx].status = newStatus
+  pushStatusHistory(orders[idx], newStatus, note)
+  saveOrders(orders)
+  return orders[idx]
+}
+
+export function assignResi(
+  orderId: string,
+  courier: string,
+  courierLabel: string,
+  trackingNumber: string,
+  pickupType: 'dropoff' | 'pickup',
+  pickupWindow?: string,
+): Order | null {
+  const orders = loadOrders()
+  const idx = orders.findIndex(o => o.id === orderId)
+  if (idx === -1) return null
+
+  orders[idx].logistics = {
+    courier,
+    courierLabel,
+    trackingNumber,
+    awbPrinted: false,
+    pickupType,
+    pickupWindow,
+    shippedAt: new Date().toISOString(),
+  }
+  orders[idx].status = 'shipping'
+  pushStatusHistory(orders[idx], 'shipping', `Resi: ${trackingNumber} (${courierLabel})`)
+  saveOrders(orders)
+  return orders[idx]
+}
+
+export function markAwbPrinted(orderId: string): Order | null {
+  const orders = loadOrders()
+  const idx = orders.findIndex(o => o.id === orderId)
+  if (idx === -1) return null
+  if (orders[idx].logistics) orders[idx].logistics.awbPrinted = true
+  saveOrders(orders)
+  return orders[idx]
+}
+
+export function bulkUpdateOrderStatus(ids: string[], newStatus: OrderStatus, note?: string): Order[] {
+  const orders = loadOrders()
+  const updated: Order[] = []
+  ids.forEach(id => {
+    const idx = orders.findIndex(o => o.id === id)
+    if (idx !== -1) {
+      orders[idx].status = newStatus
+      pushStatusHistory(orders[idx], newStatus, note)
+      updated.push(orders[idx])
+    }
+  })
+  saveOrders(orders)
+  return updated
+}
+
+export function bulkAssignResi(
+  items: { orderId: string; courier: string; courierLabel: string; trackingNumber: string; pickupType: 'dropoff' | 'pickup' }[],
+): { success: Order[]; failed: string[] } {
+  const orders = loadOrders()
+  const success: Order[] = []
+  const failed: string[] = []
+
+  items.forEach(item => {
+    const idx = orders.findIndex(o => o.id === item.orderId)
+    if (idx === -1) {
+      failed.push(item.orderId)
+      return
+    }
+    try {
+      orders[idx].logistics = {
+        courier: item.courier,
+        courierLabel: item.courierLabel,
+        trackingNumber: item.trackingNumber,
+        awbPrinted: false,
+        pickupType: item.pickupType,
+        shippedAt: new Date().toISOString(),
+      }
+      orders[idx].status = 'shipping'
+      pushStatusHistory(orders[idx], 'shipping', `Resi: ${item.trackingNumber} (${item.courierLabel})`)
+      success.push(orders[idx])
+    } catch {
+      failed.push(item.orderId)
+    }
+  })
+
+  saveOrders(orders)
+  return { success, failed }
+}
+
+export function loadOrdersByStatus(status?: OrderStatus): Order[] {
+  const orders = loadOrders()
+  if (!status) return orders
+  return orders.filter(o => o.status === status)
+}
+
+export function loadPaginatedOrders(
+  page: number,
+  pageSize: number,
+  statusFilter?: OrderStatus | null,
+  search?: string,
+  sortField?: 'date' | 'total',
+  sortDir?: 'asc' | 'desc',
+): { orders: Order[]; total: number; page: number; totalPages: number } {
+  let orders = loadOrders()
+
+  if (statusFilter) {
+    orders = orders.filter(o => o.status === statusFilter)
+  }
+
+  if (search && search.trim()) {
+    const q = search.toLowerCase().trim()
+    orders = orders.filter(o =>
+      o.id.toLowerCase().includes(q) ||
+      o.customer.name.toLowerCase().includes(q) ||
+      o.customer.phone.toLowerCase().includes(q) ||
+      (o.logistics?.trackingNumber || '').toLowerCase().includes(q),
+    )
+  }
+
+  if (sortField === 'total') {
+    orders.sort((a, b) => sortDir === 'asc' ? a.total - b.total : b.total - a.total)
+  } else {
+    orders.sort((a, b) => {
+      const diff = new Date(b.date).getTime() - new Date(a.date).getTime()
+      return sortDir === 'asc' ? -diff : diff
+    })
+  }
+
+  const total = orders.length
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const start = (page - 1) * pageSize
+  const paged = orders.slice(start, start + pageSize)
+
+  return { orders: paged, total, page, totalPages }
+}
+
+export function getStatusCounts(): Record<string, number> {
+  const orders = loadOrders()
+  const counts: Record<string, number> = { all: orders.length }
+  orders.forEach(o => {
+    const s = o.status || 'unknown'
+    counts[s] = (counts[s] || 0) + 1
+  })
+  return counts
+}
+
+export function cancelOrder(orderId: string, reason: string): Order | null {
+  const orders = loadOrders()
+  const idx = orders.findIndex(o => o.id === orderId)
+  if (idx === -1) return null
+  orders[idx].status = 'cancelled'
+  orders[idx].cancelNote = reason
+  pushStatusHistory(orders[idx], 'cancelled', reason)
+  saveOrders(orders)
+  return orders[idx]
+}
+
+export function clearOrders(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch { /* noop */ }
+}
+
+// ─── Courier prefixes for mock resi generation ──────────
+const COURIER_PREFIXES: Record<string, string> = {
+  jne_reg: 'JNE',
+  jne_yes: 'JNY',
+  jnt: 'JP',
+  sicepat: 'SPX',
+  instant: 'GO',
+  pickup: 'PKP',
+}
+
+export function generateResiNumber(courierId: string): string {
+  const prefix = COURIER_PREFIXES[courierId] || 'RSI'
+  const now = new Date()
+  const dd = String(now.getDate()).padStart(2, '0')
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const yy = String(now.getFullYear()).slice(2)
+  const rand = String(Math.floor(1000 + Math.random() * 9000))
+  return `${prefix}${dd}${mm}${yy}-${rand}`
+}
+
+export function getResiPlaceholder(trackingNumber: string): string {
+  return trackingNumber || '-'
 }
 
 export const SHIPPING_METHODS: ShippingOption[] = [

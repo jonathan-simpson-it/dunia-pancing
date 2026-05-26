@@ -64,6 +64,8 @@ export default function Checkout() {
     }
   }
 
+  const isWalkinPayment = payment.type === 'pay_store' || payment.type === 'cod'
+
   const handlePlaceOrder = () => {
     setPlacing(true)
     const order = createOrder({
@@ -92,11 +94,13 @@ export default function Checkout() {
       }
     })
 
-    const msg = buildWhatsAppMessage(order, lang)
-    window.open(
-      `https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`,
-      '_blank'
-    )
+    if (!isWalkinPayment) {
+      const msg = buildWhatsAppMessage(order, lang)
+      window.open(
+        `https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`,
+        '_blank'
+      )
+    }
 
     navigate(`/order-success/${order.id}`)
   }

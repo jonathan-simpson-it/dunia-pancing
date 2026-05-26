@@ -60,6 +60,7 @@ export default function OrderSuccess() {
   }
 
   const isBankTransfer = order.payment.type === 'bank_transfer'
+  const isWalkinPayment = order.payment.type === 'pay_store' || order.payment.type === 'cod'
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
@@ -136,7 +137,26 @@ export default function OrderSuccess() {
           </div>
         )}
 
-        {!isBankTransfer && (
+        {isWalkinPayment && (
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-900 mb-2">{t('order_success_payment_info', lang)}</h3>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center mb-4">
+              <div className="text-3xl mb-2">
+                {order.payment.type === 'pay_store' ? '🏪' : '💵'}
+              </div>
+              <p className="text-sm font-bold text-emerald-800">
+                {lang === 'id'
+                  ? 'Pesanan dicatat — Silakan selesaikan pembayaran di toko'
+                  : 'Order recorded — Please complete payment at store'}
+              </p>
+              <p className="text-[12px] text-emerald-600 mt-1">
+                {order.payment.label} — {formatPrice(order.total)}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!isBankTransfer && !isWalkinPayment && (
           <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6 shadow-sm">
             <h3 className="text-sm font-bold text-slate-900 mb-2">{t('order_success_payment_info', lang)}</h3>
             <p className="text-[13px] text-slate-600 mb-4">

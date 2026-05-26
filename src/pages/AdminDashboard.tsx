@@ -46,6 +46,7 @@ export default function AdminDashboard() {
   const sidebarLinks = [
     { key: 'products', label_id: 'Produk', label_en: 'Products', icon: '📦' },
     { key: 'categories', label_id: 'Kategori', label_en: 'Categories', icon: '🏷️' },
+    { to: '/admin/orders', label_id: 'Pesanan', label_en: 'Orders', icon: '📋', isLink: true as const },
     { to: '/admin/add', label_id: 'Tambah Produk', label_en: 'Add Product', icon: '➕', isLink: true as const },
     { to: '/admin/import', label_id: 'Import Harga', label_en: 'Price Import', icon: '📥', isLink: true as const },
     { to: '/admin/revenue', label_id: 'Pendapatan', label_en: 'Revenue', icon: '💰', isLink: true as const },

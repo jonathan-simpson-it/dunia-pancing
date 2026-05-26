@@ -75,7 +75,30 @@ export interface PaymentInfo {
   accountNumber: string
 }
 
-export type OrderStatus = 'waiting_payment'
+export type OrderStatus =
+  | 'waiting_payment'
+  | 'paid'
+  | 'to_ship'
+  | 'shipping'
+  | 'completed'
+  | 'cancelled'
+
+export interface StatusHistoryEntry {
+  status: OrderStatus
+  timestamp: string
+  note?: string
+}
+
+export interface LogisticsInfo {
+  courier: string
+  courierLabel: string
+  trackingNumber: string
+  awbPrinted: boolean
+  pickupType: 'dropoff' | 'pickup'
+  pickupWindow?: string
+  shippedAt?: string
+  deliveredAt?: string
+}
 
 export interface Order {
   id: string
@@ -88,6 +111,9 @@ export interface Order {
   subtotal: number
   shipping_fee: number
   total: number
+  logistics?: LogisticsInfo
+  statusHistory: StatusHistoryEntry[]
+  cancelNote?: string
 }
 
 export interface ShippingOption {

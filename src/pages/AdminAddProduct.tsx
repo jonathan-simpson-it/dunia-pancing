@@ -83,6 +83,9 @@ export default function AdminAddProduct() {
               <Link to="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
                 <span>📦</span><span>{t('admin_products', lang)}</span>
               </Link>
+              <Link to="/admin/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
+                <span>📋</span><span>{lang === 'id' ? 'Pesanan' : 'Orders'}</span>
+              </Link>
               <Link to="/admin/add" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold bg-brand-primary text-white transition-all">
                 <span>➕</span><span>{t('admin_add_product', lang)}</span>
               </Link>
