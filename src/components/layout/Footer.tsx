@@ -1,5 +1,7 @@
+'use client'
+
 import { useLang } from '../../context/LanguageContext'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import id from '../../locales/id.json'
 import en from '../../locales/en.json'
 
@@ -27,8 +29,8 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm leading-relaxed max-w-sm font-medium">
-              {lang === 'id' 
-                ? 'Mitra terpercaya pemancing di Palembang sejak 1998. Kami menghadirkan kualitas tingkat dunia untuk hobi memancing Anda.' 
+              {lang === 'id'
+                ? 'Mitra terpercaya pemancing di Palembang sejak 1998. Kami menghadirkan kualitas tingkat dunia untuk hobi memancing Anda.'
                 : 'Palembang\'s most trusted angling partner since 1998. Bringing world-class quality gear to your local fishing experience.'}
             </p>
             <div className="flex items-center gap-4">
@@ -44,9 +46,9 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-8">Navigation</h4>
             <ul className="space-y-4">
-              <li><Link to="/" className="text-sm font-bold hover:text-sky-400 transition-colors">Home</Link></li>
-              <li><Link to="/catalog" className="text-sm font-bold hover:text-sky-400 transition-colors">Digital Catalog</Link></li>
-              <li><Link to="/contact" className="text-sm font-bold hover:text-sky-400 transition-colors">Visit Store</Link></li>
+              <li><Link href="/" className="text-sm font-bold hover:text-sky-400 transition-colors">Home</Link></li>
+              <li><Link href="/catalog" className="text-sm font-bold hover:text-sky-400 transition-colors">Digital Catalog</Link></li>
+              <li><Link href="/contact" className="text-sm font-bold hover:text-sky-400 transition-colors">Visit Store</Link></li>
             </ul>
           </div>
 
@@ -63,8 +65,8 @@ export default function Footer() {
             <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-8">Newsletter</h4>
             <p className="text-xs font-bold text-slate-500 mb-6 tracking-wide">Get stock updates and pro tips.</p>
             <div className="flex gap-2">
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="Email address"
                 className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/50 flex-1"
               />
@@ -76,7 +78,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-24 pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">
             © 2024 DUNIA PANCING PALEMBANG. ALL RIGHTS RESERVED.

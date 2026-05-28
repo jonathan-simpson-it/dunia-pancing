@@ -1,5 +1,7 @@
+'use client'
+
 import { useState, useRef, memo } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useLang } from '../../context/LanguageContext'
 import id from '../../locales/id.json'
 import en from '../../locales/en.json'
@@ -78,7 +80,7 @@ function ProductCard({ product }: ProductCardProps) {
         onTouchEnd={hasMultiple ? handleTouchEnd : undefined}
         style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 240px' }}
       >
-        <Link to={`/product/${product.id}`} className="block w-full h-full">
+        <Link href={`/product/${product.id}`} className="block w-full h-full">
           {images.map((src, i) => (
             <img
               key={i}
@@ -143,7 +145,7 @@ function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="p-2">
-        <Link to={`/product/${product.id}`}>
+        <Link href={`/product/${product.id}`}>
           <h3 className="text-[11px] font-medium text-slate-900 leading-snug line-clamp-2 min-h-[2rem] hover:text-brand-primary transition-colors">
             {name}
           </h3>
@@ -175,7 +177,7 @@ function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <Link
-          to={`/product/${product.id}`}
+          href={`/product/${product.id}`}
           className="mt-1.5 w-full inline-flex items-center justify-center gap-1 py-1 bg-brand-primary hover:bg-sky-600 text-white text-[10px] font-bold rounded transition-colors active:scale-[0.98]"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>

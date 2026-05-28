@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3001/api/kiriminaja'
+const API_BASE = '/api/kiriminaja'
 
 export interface PricingRequest {
   origin: number

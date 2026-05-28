@@ -1,7 +1,11 @@
+'use client'
+
 import { useLang } from '../../context/LanguageContext'
-import { Link, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useCart } from '../../context/CartContext'
 import { useAuth } from '../../context/AuthContext'
+import { useSearch } from '../../context/SearchContext'
 import id from '../../locales/id.json'
 import en from '../../locales/en.json'
 
@@ -9,17 +13,13 @@ const localeId = id as Record<string, string>
 const localeEn = en as Record<string, string>
 const t = (key: string, lang: 'id' | 'en'): string => lang === 'id' ? localeId[key] : localeEn[key]
 
-interface NavbarProps {
-  searchTerm: string
-  onSearchChange: (s: string) => void
-}
-
-export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
+export default function Navbar() {
   const { lang, toggleLang } = useLang()
   const { itemCount } = useCart()
   const { isLoggedIn, isAdmin, user, logout } = useAuth()
-  const location = useLocation()
-  const isCatalog = location.pathname === '/catalog'
+  const pathname = usePathname()
+  const { searchTerm, setSearchTerm } = useSearch()
+  const isCatalog = pathname === '/catalog'
 
   const links = [
     { to: '/', key: 'nav_home' },
@@ -31,7 +31,7 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
     <nav className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-3 shrink-0 group">
+          <Link href="/" className="flex items-center gap-3 shrink-0 group">
             <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center group-hover:bg-sky-400 transition-colors shadow-lg shadow-sky-500/20">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -53,9 +53,9 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
               {links.map(l => (
                 <Link
                   key={l.to}
-                  to={l.to}
+                  href={l.to}
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    location.pathname === l.to
+                    pathname === l.to
                       ? 'text-sky-400'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
                   }`}
@@ -65,9 +65,9 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
               ))}
               {isAdmin && (
                 <Link
-                  to="/admin"
+                  href="/admin"
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    location.pathname.startsWith('/admin')
+                    pathname.startsWith('/admin')
                       ? 'text-sky-400'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
                   }`}
@@ -79,7 +79,7 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
 
             {isLoggedIn && (
               <Link
-                to={isAdmin ? '/admin' : '/account'}
+                href={isAdmin ? '/admin' : '/account'}
                 className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -88,13 +88,13 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
               </Link>
             )}
             <Link
-              to={isLoggedIn ? (isAdmin ? '/admin' : '/account') : '/login'}
+              href={isLoggedIn ? (isAdmin ? '/admin' : '/account') : '/login'}
               className="hidden md:flex items-center justify-center px-3 py-2 rounded-xl text-[11px] font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
             >
               {isLoggedIn ? user?.name : (lang === 'id' ? 'Masuk' : 'Login')}
             </Link>
             <Link
-              to="/cart"
+              href="/cart"
               className="relative md:flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -131,7 +131,7 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
               <input
                 type="text"
                 value={searchTerm || ''}
-                onChange={e => onSearchChange(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 placeholder={t('nav_search_placeholder', lang)}
                 className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-800/50 text-white placeholder-slate-500 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-sm"
               />

@@ -1,5 +1,5 @@
 import { useLang } from '../../context/LanguageContext'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import id from '../../locales/id.json'
 import en from '../../locales/en.json'
 import { SHOPEE_STORE_URL } from '../../utils/shopee'
@@ -42,7 +42,7 @@ export default function Hero() {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4">
             <Link
-              to="/catalog"
+              href="/catalog"
               className="px-8 py-4 bg-sky-500 text-white font-bold rounded-2xl hover:bg-sky-400 transition-all shadow-xl shadow-sky-500/25 active:scale-95 text-center"
             >
               {t('hero_cta_catalog', lang)}
