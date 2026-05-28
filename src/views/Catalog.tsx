@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import { useProducts } from '../context/ProductStore'
@@ -20,7 +20,9 @@ export default function Catalog() {
   const { lang } = useLang()
   const { products, categories: allCategories, getCategoryName } = useProducts()
   const { searchTerm, setSearchTerm } = useSearch()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [sort, setSort] = useState<string>('relevance')
   const [showFilter, setShowFilter] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -33,13 +35,13 @@ export default function Catalog() {
   const activeCategory = searchParams.get('category') || 'all'
 
   const setCategory = (cat: string) => {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams.toString())
     if (cat === 'all') {
       params.delete('category')
     } else {
       params.set('category', cat)
     }
-    setSearchParams(params)
+    router.push(pathname + '?' + params.toString())
     setShowFilter(false)
   }
 

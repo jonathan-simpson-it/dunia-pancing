@@ -187,7 +187,7 @@ test.describe('Customer Buying Flow (Priority)', () => {
     await page.getByRole('button', { name: /Konfirmasi Pesanan|Confirm Order/ }).click()
     await page.waitForTimeout(1500)
     await expect(page).toHaveURL(/\/order-success\/DP-/)
-    await expect(page.getByText(/Pesanan Berhasil|Order Successful/)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Pesanan Berhasil|Order Successful/ })).toBeVisible()
   })
 
   test('Language toggle switches between ID and EN', async ({ page }) => {

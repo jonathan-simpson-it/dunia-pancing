@@ -221,7 +221,7 @@ export default function OrderSuccess() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pb-8">
           <Link
-            to="/catalog"
+            href="/catalog"
             className="px-8 py-3 bg-brand-primary text-white text-sm font-bold rounded-xl hover:bg-sky-600 transition-all text-center shadow"
           >
             {t('order_success_continue', lang)}

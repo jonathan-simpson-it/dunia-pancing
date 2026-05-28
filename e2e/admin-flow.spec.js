@@ -11,17 +11,15 @@ test.describe('Admin Functionalities', () => {
     })
     await page.goto('/login')
     await page.waitForLoadState('load')
-    await page.waitForTimeout(500)
     await page.locator('input[placeholder="admin"]').fill('admin')
     await page.locator('input[placeholder="••••••"]').fill('admin123')
     await page.locator('form').first().evaluate(form => form.requestSubmit())
-    await page.waitForURL('/admin')
-    await page.waitForTimeout(300)
+    await page.waitForURL(/\/admin(\/|$)/)
   }
 
   test('Admin login works and redirects to dashboard', async ({ page }) => {
     await adminLogin(page)
-    await expect(page).toHaveURL('/admin')
+    await expect(page).toHaveURL(/\/admin(\/|$)/)
   })
 
   test('Admin dashboard shows product table', async ({ page }) => {
@@ -85,9 +83,7 @@ test.describe('Admin Functionalities', () => {
 
     // Submit form
     await page.getByRole('button', { name: /Simpan|Save/ }).click()
-    await page.waitForTimeout(2000)
-
-    await expect(page).toHaveURL('/admin')
+    await page.waitForURL('/admin')
   })
 
   test('Admin category management: add category', async ({ page }) => {
@@ -116,7 +112,8 @@ test.describe('Admin Functionalities', () => {
   })
 
   test('Admin Revenue page shows stats', async ({ page }) => {
-    await page.goto('/')
+    await adminLogin(page)
+
     await page.evaluate(() => {
       const orders = [{
         id: 'DP-240524-001',
@@ -131,14 +128,10 @@ test.describe('Admin Functionalities', () => {
         total: 115000,
       }]
       localStorage.setItem('dunia-pancing-orders', JSON.stringify(orders))
-      localStorage.setItem('dunia-pancing-session', JSON.stringify({ username: 'admin', role: 'admin', name: 'Admin' }))
-      localStorage.setItem('dunia-pancing-users', JSON.stringify([{ username: 'admin', password: 'admin123', role: 'admin', name: 'Admin' }]))
     })
     await page.reload()
-    await page.waitForTimeout(500)
 
     await page.goto('/admin/revenue')
-    await page.waitForTimeout(500)
 
     await expect(page.getByText(/Total Pendapatan|Total Revenue/)).toBeVisible()
     await expect(page.getByText('Rp').first()).toBeVisible()

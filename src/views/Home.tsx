@@ -36,7 +36,7 @@ export default function Home() {
           {categories.map(cat => (
             <Link
               key={cat.key}
-              to={`/catalog?category=${cat.key}`}
+              href={`/catalog?category=${cat.key}`}
               className="group relative flex flex-col items-center gap-4 p-8 bg-white rounded-4xl border border-slate-100 hover:border-sky-200 transition-all duration-500 hover:shadow-2xl hover:shadow-sky-500/10 hover:-translate-y-2"
             >
               <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-sky-50 group-hover:scale-110 transition-all duration-500">
@@ -70,7 +70,7 @@ export default function Home() {
               </p>
             </div>
             <Link 
-              to="/catalog" 
+              href="/catalog" 
               className="group inline-flex items-center gap-2 text-sky-600 font-black uppercase tracking-widest text-sm hover:text-sky-500 transition-colors"
             >
               Explore Catalog
@@ -105,7 +105,7 @@ export default function Home() {
               </p>
             </div>
             <Link
-              to="/catalog?sort=bestseller"
+              href="/catalog?sort=bestseller"
               className="group inline-flex items-center gap-2 text-orange-600 font-black uppercase tracking-widest text-sm hover:text-orange-500 transition-colors"
             >
               {lang === 'id' ? 'Lihat Semua' : 'See All'}
@@ -201,13 +201,13 @@ export default function Home() {
               </div>
               <div className="flex flex-wrap gap-4">
                 <Link 
-                  to="/catalog" 
+                  href="/catalog" 
                   className="px-10 py-5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 active:scale-95 text-center"
                 >
                   Shop Now
                 </Link>
                 <Link 
-                  to="/contact" 
+                  href="/contact" 
                   className="px-10 py-5 bg-white text-slate-900 border-2 border-slate-100 font-bold rounded-2xl hover:bg-slate-50 transition-all active:scale-95 text-center"
                 >
                   {t('nav_contact', lang)}

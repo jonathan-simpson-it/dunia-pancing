@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useLang } from '../context/LanguageContext'
 import { useAuth } from '../context/AuthContext'
 import { loadOrders } from '../utils/order'
@@ -12,6 +13,7 @@ const t = (key: string, lang: 'id' | 'en'): string => lang === 'id' ? localeId[k
 
 export default function Account() {
   const { lang } = useLang()
+  const router = useRouter()
   const { user, logout } = useAuth()
 
   const formatPrice = (amount: number) =>
@@ -44,7 +46,7 @@ export default function Account() {
               </div>
             </div>
             <button
-              onClick={logout}
+              onClick={() => { logout(); router.push('/login') }}
               className="px-4 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 rounded-lg transition-all"
             >
               {lang === 'id' ? 'Keluar' : 'Logout'}

@@ -37,7 +37,7 @@ export default function Cart() {
             <h2 className="text-xl font-bold text-slate-900 mb-2">{t('cart_empty', lang)}</h2>
             <p className="text-slate-500 mb-8">{t('cart_empty_desc', lang)}</p>
             <Link
-              to="/catalog"
+              href="/catalog"
               className="inline-flex items-center px-8 py-3 bg-brand-primary text-white font-bold rounded-xl hover:bg-sky-600 transition-colors shadow-lg shadow-sky-500/20"
             >
               {t('cart_empty_cta', lang)}
@@ -119,7 +119,7 @@ export default function Cart() {
                   </div>
                 </div>
                 <button
-                  onClick={() => navigate('/checkout')}
+                  onClick={() => router.push('/checkout')}
                   className="mt-6 w-full py-3.5 bg-brand-primary hover:bg-sky-600 text-white text-sm font-bold rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>

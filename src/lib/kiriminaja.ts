@@ -3,11 +3,6 @@ export const KA_HEADERS: Record<string, string> = {
   'Content-Type': 'application/json',
 }
 
-async function getApiKey() {
-  const key = process.env.KIRIMINAJA_API_KEY || ''
-  return key ? { Authorization: `Bearer ${key}` } : {}
-}
-
 function getBaseUrl() {
   return process.env.KIRIMINAJA_ENV === 'production'
     ? 'https://client.kiriminaja.com'
@@ -15,10 +10,14 @@ function getBaseUrl() {
 }
 
 export async function kaPost(path: string, body: unknown) {
-  const authHeaders = await getApiKey()
+  const headers: Record<string, string> = { ...KA_HEADERS }
+  const key = process.env.KIRIMINAJA_API_KEY
+  if (key) {
+    headers.Authorization = `Bearer ${key}`
+  }
   const res = await fetch(`${getBaseUrl()}/api/v1${path}`, {
     method: 'POST',
-    headers: { ...KA_HEADERS, ...authHeaders },
+    headers,
     body: JSON.stringify(body),
   })
   if (!res.ok) {

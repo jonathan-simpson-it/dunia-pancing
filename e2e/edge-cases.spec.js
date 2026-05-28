@@ -294,7 +294,7 @@ test.describe('Edge Cases & Additional Flows', () => {
 
     // Verify order success page
     await expect(page).toHaveURL(/\/order-success\/DP-/)
-    await expect(page.getByText(/Pesanan Berhasil|Order Successful/)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Pesanan Berhasil|Order Successful/ })).toBeVisible()
 
     // Order ID visible
     await expect(page.getByText(/DP-/).first()).toBeVisible()

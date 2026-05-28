@@ -141,7 +141,7 @@ export default function ProductDetail() {
                 {product.brand}
               </span>
               <Link
-                to={`/catalog?category=${product.category}`}
+                href={`/catalog?category=${product.category}`}
                 className="text-[10px] font-semibold text-sky-600 bg-sky-50 px-2 py-0.5 rounded capitalize hover:bg-sky-100 transition-colors"
               >
                 {getCategoryName(product.category, lang)}

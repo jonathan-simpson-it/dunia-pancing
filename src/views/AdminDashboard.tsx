@@ -134,7 +134,7 @@ export default function AdminDashboard() {
                 {sidebarLinks.map(link => {
                   if (link.isLink) {
                     return (
-                      <Link key={link.key || link.to} to={link.to}
+                      <Link key={link.key || link.to} href={link.to}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
                         <span>{link.icon}</span><span>{lang === 'id' ? link.label_id : link.label_en}</span>
                       </Link>
