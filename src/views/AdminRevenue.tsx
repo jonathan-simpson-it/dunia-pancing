@@ -64,50 +64,7 @@ export default function AdminRevenue() {
   const maxMonth = Math.max(...Object.values(data.byMonth), 1)
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-16">
-
-
-      <div className="max-w-7xl mx-auto px-4 pt-28">
-        <div className="flex flex-col sm:flex-row gap-6">
-          <aside className="w-full sm:w-56 shrink-0">
-            <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-50">
-                <div className="text-sm font-bold text-slate-900">{user?.name || 'Admin'}</div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Admin Panel</div>
-              </div>
-              <div className="p-2 space-y-0.5">
-                <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                </Link>
-                <Link href="/admin/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                </Link>
-                <Link href="/admin/add" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                </Link>
-                <Link href="/admin/import" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                </Link>
-                <Link href="/admin/revenue" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold bg-brand-primary text-white transition-all">
-                </Link>
-                <Link href="/admin/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                  <span>📋</span><span>{lang === 'id' ? 'Pesanan' : 'Orders'}</span>
-                </Link>
-                <Link href="/admin/add" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                  <span>➕</span><span>{lang === 'id' ? 'Tambah Produk' : 'Add Product'}</span>
-                </Link>
-                <Link href="/admin/import" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                  <span>📥</span><span>{t('admin_import', lang)}</span>
-                </Link>
-                <Link href="/admin/revenue" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold bg-brand-primary text-white transition-all">
-                  <span>💰</span><span>{lang === 'id' ? 'Pendapatan' : 'Revenue'}</span>
-                </Link>
-              </div>
-              <div className="border-t border-slate-50 p-2">
-                <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-red-500 hover:bg-red-50 transition-all">
-                  <span>🚪</span><span>{t('admin_logout', lang)}</span>
-                </button>
-              </div>
-            </div>
-          </aside>
-
-          <div className="flex-1 min-w-0">
+    <>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               {stats.map((s, i) => (
                 <div key={i} className={`${s.bg} rounded-xl border border-slate-100 p-4`}>
@@ -289,9 +246,6 @@ export default function AdminRevenue() {
                 </table>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   )
 }

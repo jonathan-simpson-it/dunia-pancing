@@ -176,6 +176,19 @@ export interface FormErrors {
   [key: string]: string
 }
 
+// ─── Blog ────────────────────────────────────────────────
+export interface BlogPost {
+  id: number
+  slug: string
+  title: string
+  excerpt: string
+  content: string
+  date: string
+  author: string
+  image: string
+  category: string
+}
+
 // ─── Admin Import ──────────────────────────────────────
 export interface PriceUpdate {
   id?: string

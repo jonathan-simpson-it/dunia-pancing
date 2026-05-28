@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLang } from '../context/LanguageContext'
 import { useAuth } from '../context/AuthContext'
@@ -14,7 +15,15 @@ const t = (key: string, lang: 'id' | 'en'): string => lang === 'id' ? localeId[k
 export default function Account() {
   const { lang } = useLang()
   const router = useRouter()
-  const { user, logout } = useAuth()
+  const { user, logout, loaded, isLoggedIn } = useAuth()
+
+  useEffect(() => {
+    if (loaded && !isLoggedIn) {
+      router.replace('/login')
+    }
+  }, [loaded, isLoggedIn, router])
+
+  if (loaded && !isLoggedIn) return null
 
   const formatPrice = (amount: number) =>
     new Intl.NumberFormat('id-ID', {

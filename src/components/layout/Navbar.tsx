@@ -24,6 +24,7 @@ export default function Navbar() {
   const links = [
     { to: '/', key: 'nav_home' },
     { to: '/catalog', key: 'nav_catalog' },
+    { to: '/blog', key: 'nav_blog' },
     { to: '/contact', key: 'nav_contact' },
   ]
 

@@ -1,0 +1,631 @@
+[     771ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:25630
+[     965ms] Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <CartProvider>
+      <SearchProvider>
+        <ChatProvider>
+          <ScrollToTop>
+          <div className="min-h-scre...">
+            <Navbar>
+              <nav className="sticky top...">
+                <div className="max-w-7xl ...">
+                  <div className="flex items...">
+                    <LinkComponent>
+                    <div className="flex items...">
+                      <div className="hidden md:...">
+                        <LinkComponent>
+                        <LinkComponent>
+                        <LinkComponent>
+                        <LinkComponent>
+                        <LinkComponent href="/admin" className="px-4 py-2 ...">
++                         <a
++                           className="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-sky-400"
++                           ref={function}
++                           onClick={function onClick}
++                           onMouseEnter={function onMouseEnter}
++                           onTouchStart={function onTouchStart}
++                           href="/admin"
++                         >
+                      ...
+            ...
+
+    at throwOnHydrationMismatch (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:4506:11)
+    at beginWork (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:11107:17)
+    at runWithFiberInDEV (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:872:30)
+    at performUnitOfWork (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15727:22)
+    at workLoopConcurrentByScheduler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15721:9)
+    at renderRootConcurrent (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15696:15)
+    at performWorkOnRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14990:13)
+    at performWorkOnRootViaSchedulerTask (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:16816:7)
+    at MessagePort.performWorkUntilDeadline (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/scheduler/cjs/scheduler.development.js:45:48)
+[   25805ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[   26140ms] [LOG] [Fast Refresh] done in 335ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[   27597ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[   27716ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/views/AdminAddProduct.tsx
+./app/admin/add/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56
+[   27723ms] [LOG] {file: Object} @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   27795ms] [LOG] [Fast Refresh] done in 197ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[   27875ms] [LOG] [Fast Refresh] done in 277ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[   28017ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/views/AdminAddProduct.tsx
+./app/admin/add/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56
+[   28019ms] [LOG] {file: Object} @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   30424ms] [LOG] [Fast Refresh] done in 2826ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[   30629ms] [LOG] [Fast Refresh] done in 3031ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/report-hmr-latency.js:13
+[   30821ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/views/AdminAddProduct.tsx
+./app/admin/add/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56
+[   30824ms] [LOG] {file: Object} @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   31007ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/add?_rsc=YoZyISxTxLAYHUpn:0
+[   31022ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/add?_rsc=YZxoNrfnTgG0vYWm:0
+[   31038ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/add?_rsc=YZxoNrfnTgG0vYWm:0
+[   31139ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/add:0
+[   31490ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[   31597ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   31610ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   31612ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   31629ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3456/favicon.ico:0
+[   31646ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   43980ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/add:0
+[   44269ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[   44283ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   44283ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   44284ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   44304ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   53937ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/add:0
+[   54316ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[   54334ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   54335ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   54336ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   54371ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   75573ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/add:0
+[   75905ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[   75937ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   75938ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   75941ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   75982ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   88151ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin/orders:0
+[   88476ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[   88500ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   88495ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   88496ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   88527ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   89981ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/admin:0
+[   90262ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[   90276ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   90277ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   90278ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   90305ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   94360ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3456/_next/static/webpack/3ecf3c4ec7dea819.webpack.hot-update.json:0
+[   94360ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:347
+[   94630ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:206
+[   94881ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/views/AdminAddProduct.tsx
+./app/admin/add/page.tsx @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   94882ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[   95153ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/:0
+[   95576ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom-client.development.js:28004
+[   95587ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/devoob/Downloads/tobedeleted/duniapancing/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   95592ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/websocket.js:45
+[   95592ms] [ERROR] ./src/views/AdminAddProduct.tsx
+Error:   x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:153:1]
+ 150 |               </button>
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+     :       ^
+ 154 |   )
+ 155 | }
+     `----
+  x Expression expected
+     ,-[/Users/devoob/Downloads/tobedeleted/duniapancing/src/views/AdminAddProduct.tsx:154:1]
+ 151 |             </div>
+ 152 |           </form>
+ 153 |     </>
+ 154 |   )
+     :   ^
+ 155 | }
+     `----
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:76
+[   95622ms] [LOG] {file: Object} @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/compiled/next-devtools/index.js:1630
+[  352267ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:206
+[  352294ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3456/_next/static/webpack/3ecf3c4ec7dea819.webpack.hot-update.json:0
+[  352296ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:347
+[  353074ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3456/_next/static/webpack/3ecf3c4ec7dea819.webpack.hot-update.json:0
+[  353074ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:347
+[  354331ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:25630
+[  354540ms] Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <CartProvider>
+      <SearchProvider>
+        <ChatProvider>
+          <ScrollToTop>
+          <div className="min-h-scre...">
+            <Navbar>
+              <nav className="sticky top...">
+                <div className="max-w-7xl ...">
+                  <div className="flex items...">
+                    <LinkComponent>
+                    <div className="flex items...">
+                      <div className="hidden md:...">
+                        <LinkComponent>
+                        <LinkComponent>
+                        <LinkComponent>
+                        <LinkComponent>
+                        <LinkComponent href="/admin" className="px-4 py-2 ...">
++                         <a
++                           className="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-400 hover:..."
++                           ref={function}
++                           onClick={function onClick}
++                           onMouseEnter={function onMouseEnter}
++                           onTouchStart={function onTouchStart}
++                           href="/admin"
++                         >
+                      ...
+            ...
+
+    at throwOnHydrationMismatch (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:4506:11)
+    at beginWork (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:11107:17)
+    at runWithFiberInDEV (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:872:30)
+    at performUnitOfWork (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15727:22)
+    at workLoopConcurrentByScheduler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15721:9)
+    at renderRootConcurrent (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:15696:15)
+    at performWorkOnRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14990:13)
+    at performWorkOnRootViaSchedulerTask (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:16816:7)
+    at MessagePort.performWorkUntilDeadline (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/scheduler/cjs/scheduler.development.js:45:48)
+[  631902ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[  632340ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:196
+[  632374ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3456/_next/static/webpack/d3404edb1acb84dc.webpack.hot-update.json:0
+[  633053ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3456/_next/static/webpack/d3404edb1acb84dc.webpack.hot-update.json:0
+[  633179ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/?_rsc=_mjR7ylJSLpkZcZ3:0
+[  633870ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3456/:0

@@ -101,7 +101,7 @@
   "product_price_original": "Original price",
   "contact_title": "Contact Us",
   "contact_address": "Address",
-  "contact_address_detail": "Jl. Kebon Jahe, Ilir Timur I, Palembang, South Sumatra",
+  "contact_address_detail": "Jl. Kb. Jahe No. 550, Ilir Timur I, Palembang, South Sumatra",
   "contact_phone": "Phone",
   "contact_hours": "Operating Hours",
   "contact_hours_weekday": "Monday - Saturday",
@@ -225,5 +225,11 @@
   "seo_catalog_title": "Product Catalog — Dunia Pancing Palembang",
   "seo_catalog_desc": "Browse thousands of quality fishing products from trusted brands. Rods, reels, lines, hooks, lures, and accessories available.",
   "seo_contact_title": "Contact — Dunia Pancing Palembang",
-  "seo_contact_desc": "Contact Dunia Pancing Palembang. Store address, operating hours, and link to our Shopee store."
+  "seo_contact_desc": "Contact Dunia Pancing Palembang. Store address, operating hours, and link to our Shopee store.",
+  "nav_blog": "Blog",
+  "blog_title": "Blog & Articles",
+  "blog_desc": "Tips, tricks, and guides about fishing gear, techniques, and online store optimization.",
+  "blog_read_more": "Read More",
+  "blog_back": "Back to Blog",
+  "blog_by": "By"
 }

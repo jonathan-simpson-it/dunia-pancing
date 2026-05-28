@@ -187,8 +187,8 @@ export default function ProductDetail() {
             <div className="mt-3 flex items-center gap-4 text-[12px]">
               <span className="text-slate-500">
                 {t('product_detail_stock', lang)}:
-                <span className={`ml-1 font-semibold ${product.stock_qty > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                  {product.stock_qty > 0 ? `${product.stock_qty} ${t('product_stock_available', lang).toLowerCase()}` : t('product_stock_empty', lang)}
+                <span className={`ml-1 font-semibold ${product.stock_qty > 0 && product.in_stock !== false ? 'text-emerald-600' : 'text-red-500'}`}>
+                  {product.stock_qty > 0 && product.in_stock !== false ? `${product.stock_qty} ${t('product_stock_available', lang).toLowerCase()}` : t('product_stock_empty', lang)}
                 </span>
               </span>
               {product.weight && (

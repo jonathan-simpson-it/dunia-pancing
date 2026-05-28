@@ -43,10 +43,12 @@ function loadSession(): Session | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<Session | null>(loadSession)
+  const [user, setUser] = useState<Session | null>(null)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
+    const session = loadSession()
+    setUser(session)
     setLoaded(true)
   }, [])
 

@@ -101,7 +101,7 @@
   "product_price_original": "Harga asli",
   "contact_title": "Hubungi Kami",
   "contact_address": "Alamat",
-  "contact_address_detail": "Jl. Kebon Jahe, Ilir Timur I, Palembang, Sumatera Selatan",
+  "contact_address_detail": "Jl. Kb. Jahe No. 550, Ilir Timur I, Palembang, Sumatera Selatan",
   "contact_phone": "Telepon",
   "contact_hours": "Jam Operasional",
   "contact_hours_weekday": "Senin - Sabtu",
@@ -225,5 +225,11 @@
   "seo_catalog_title": "Katalog Produk — Dunia Pancing Palembang",
   "seo_catalog_desc": "Jelajahi ribuan produk alat pancing berkualitas dari merek terpercaya. Tersedia joran, reel, senar, kail, umpan, dan aksesoris.",
   "seo_contact_title": "Kontak — Dunia Pancing Palembang",
-  "seo_contact_desc": "Hubungi Dunia Pancing Palembang. Alamat toko, jam operasional, dan tautan ke toko Shopee."
+  "seo_contact_desc": "Hubungi Dunia Pancing Palembang. Alamat toko, jam operasional, dan tautan ke toko Shopee.",
+  "nav_blog": "Blog",
+  "blog_title": "Blog & Artikel",
+  "blog_desc": "Tips, trik, dan panduan seputar alat pancing, teknik memancing, dan optimasi toko online.",
+  "blog_read_more": "Baca Selengkapnya",
+  "blog_back": "Kembali ke Blog",
+  "blog_by": "Oleh"
 }

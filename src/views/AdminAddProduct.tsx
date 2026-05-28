@@ -71,38 +71,7 @@ export default function AdminAddProduct() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-16">
-      <div className="max-w-4xl mx-auto px-4 pt-28">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="bg-white rounded-xl border border-slate-100 p-2">
-            <div className="px-4 py-3 border-b border-slate-50">
-              <div className="text-sm font-bold text-slate-900">{user?.name}</div>
-              <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Admin Panel</div>
-            </div>
-            <div className="p-2 space-y-0.5">
-              <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-              </Link>
-              <Link href="/admin/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-              </Link>
-              <Link href="/admin/add" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold bg-brand-primary text-white transition-all">
-              </Link>
-              <Link href="/admin/import" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-              </Link>
-              <Link href="/admin/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                <span>📋</span><span>{lang === 'id' ? 'Pesanan' : 'Orders'}</span>
-              </Link>
-              <Link href="/admin/add" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold bg-brand-primary text-white transition-all">
-                <span>➕</span><span>{t('admin_add_product', lang)}</span>
-              </Link>
-              <Link href="/admin/import" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                <span>📥</span><span>{t('admin_import', lang)}</span>
-              </Link>
-              <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-red-500 hover:bg-red-50 transition-all mt-2">
-                <span>🚪</span><span>{t('admin_logout', lang)}</span>
-              </button>
-            </div>
-          </div>
-        </div>
+    <>
 
         {success && (
           <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold rounded-xl">
@@ -182,7 +151,6 @@ export default function AdminAddProduct() {
             </div>
           </form>
         </div>
-      </div>
-    </div>
+    </>
   )
 }

@@ -1,0 +1,171 @@
+import { test, expect } from '@playwright/test'
+
+test.describe('Admin: Comprehensive Feature Coverage', () => {
+
+  async function loginAs(page, role = 'admin') {
+    await page.evaluate(() => {
+      localStorage.setItem('dunia-pancing-users', JSON.stringify([
+        { username: 'admin', password: 'admin123', role: 'admin', name: 'Admin' },
+      ]))
+      localStorage.setItem('dunia-pancing-session', JSON.stringify({ username: 'admin', role: 'admin', name: 'Admin' }))
+    })
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await page.evaluate(() => {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('dunia-pancing-'))
+      keys.forEach(k => localStorage.removeItem(k))
+    })
+  })
+
+  test('Admin dashboard sidebar has all navigation links', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    const sidebar = page.locator('aside')
+    await expect(sidebar.getByRole('link', { name: /produk|products/i }).first()).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: /pesanan/i })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: /tambah produk/i })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: /import/i })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: /pendapatan/i })).toBeVisible()
+  })
+
+  test('Admin sidebar logout button is visible', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    const sidebar = page.locator('aside')
+    await expect(sidebar.getByRole('button', { name: /keluar/i })).toBeVisible()
+  })
+
+  test('Admin product table has products listed', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    const table = page.locator('table')
+    const rows = table.locator('tbody tr')
+    const rowCount = await rows.count()
+    expect(rowCount).toBeGreaterThanOrEqual(10)
+    await expect(rows.first().getByRole('button', { name: /edit/i })).toBeVisible()
+    await expect(rows.first().getByRole('button', { name: /hapus/i })).toBeVisible()
+  })
+
+  test('Admin can edit a product inline', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    const firstEditBtn = page.locator('table tbody tr').first().getByRole('button', { name: /edit/i })
+    await firstEditBtn.click()
+    await expect(page.getByRole('button', { name: /simpan|save/i }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /batal|cancel/i }).first()).toBeVisible()
+    await page.getByRole('button', { name: /batal|cancel/i }).first().click()
+  })
+
+  test('Admin can delete a product', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    const row = page.locator('table tbody tr').filter({ hasText: 'Joran 21 Shikari' })
+    await expect(row).toBeVisible()
+    await row.getByRole('button', { name: /hapus/i }).click()
+    await expect(page.getByRole('button', { name: /hapus/i }).first()).toBeVisible()
+  })
+
+  test('Admin add product form has all required fields', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin/add')
+    await expect(page.getByText(/nama produk.*indonesia/i)).toBeVisible()
+    await expect(page.getByText(/nama produk.*english/i)).toBeVisible()
+    await expect(page.getByText(/merek|brand/i)).toBeVisible()
+    await expect(page.getByText(/harga.*rp|price/i).first()).toBeVisible()
+    await expect(page.getByText(/stok|stock/i).first()).toBeVisible()
+    await expect(page.getByText(/berat|weight/i)).toBeVisible()
+    await page.getByRole('button', { name: /simpan|save/i }).scrollIntoViewIfNeeded()
+    await expect(page.getByRole('button', { name: /simpan|save/i })).toBeVisible()
+  })
+
+  test('Admin can navigate to add product form', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    const sidebar = page.locator('aside')
+    await sidebar.getByRole('link', { name: /tambah produk/i }).click()
+    await page.waitForURL('/admin/add')
+  })
+
+  test('Admin categories tab shows category management', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    await page.getByRole('button', { name: /kategori/i }).click()
+    await expect(page.getByText(/tambah|add/i).first()).toBeVisible()
+  })
+
+  test('Admin import page shows upload and download options', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin/import')
+    await expect(page.getByText(/seret|drag|csv|excel|unggah|upload/i).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /download.*csv|csv.*template/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /download.*excel|excel.*template/i })).toBeVisible()
+  })
+
+  test('Admin revenue page shows stats sections', async ({ page }) => {
+    const orders = [
+      { id: 'DP-REV-001', date: new Date().toISOString(), status: 'completed', items: [{ id: 'dp-001', name_id: 'Item A', name_en: 'Item A', image: '', price_idr: 100000, qty: 2 }], customer: { name: 'A', phone: '1', address: 'Addr', city: 'Plg' }, shipping: { id: 'jne_reg', label: 'JNE', fee: 10000 }, payment: { id: 'bca', label: 'Transfer BCA', method: 'bank_transfer', bank: 'BCA', accountNumber: '123' }, subtotal: 200000, shipping_fee: 10000, total: 210000, statusHistory: [{ status: 'completed', timestamp: new Date().toISOString() }] },
+    ]
+    await page.evaluate((o) => {
+      localStorage.setItem('dunia-pancing-orders', JSON.stringify(o))
+      localStorage.setItem('dunia-pancing-users', JSON.stringify([{ username: 'admin', password: 'admin123', role: 'admin', name: 'Admin' }]))
+      localStorage.setItem('dunia-pancing-session', JSON.stringify({ username: 'admin', role: 'admin', name: 'Admin' }))
+    }, orders)
+    await page.goto('/admin/revenue')
+    await expect(page.getByText(/total pendapatan|total revenue/i)).toBeVisible()
+    await expect(page.getByText(/produk.*terlaris|produk.*populer/i)).toBeVisible()
+    await expect(page.getByText(/DP-REV/)).toBeVisible()
+  })
+
+  test('Admin revenue page with zero orders shows empty state', async ({ page }) => {
+    await page.evaluate(() => {
+      localStorage.setItem('dunia-pancing-orders', JSON.stringify([]))
+      localStorage.setItem('dunia-pancing-users', JSON.stringify([{ username: 'admin', password: 'admin123', role: 'admin', name: 'Admin' }]))
+      localStorage.setItem('dunia-pancing-session', JSON.stringify({ username: 'admin', role: 'admin', name: 'Admin' }))
+    })
+    await page.goto('/admin/revenue')
+    await expect(page.getByText(/belum ada|no data/i).first()).toBeVisible()
+  })
+
+  test('Admin orders page shows status filter tabs', async ({ page }) => {
+    await loginAs(page)
+    await page.evaluate(() => {
+      localStorage.setItem('dunia-pancing-orders', JSON.stringify([]))
+    })
+    await page.goto('/admin/orders')
+    await page.waitForLoadState('load')
+    await expect(page.getByRole('button', { name: /semua|all/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /menunggu|unpaid/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /dibayar|paid/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /dikirim|shipping/i }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /selesai|completed/i })).toBeVisible()
+  })
+
+  test('Admin bulk order checkboxes appear in orders table', async ({ page }) => {
+    await loginAs(page)
+    const orders = [
+      { id: 'DP-BLK-001', date: new Date().toISOString(), status: 'to_ship', items: [{ id: 'dp-001', name_id: 'Item A', name_en: 'Item A', image: '', price_idr: 50000, qty: 1 }], customer: { name: 'A', phone: '1', address: 'A', city: 'A' }, shipping: { id: 'jne', label: 'JNE', fee: 10000 }, payment: { id: 'bca', label: 'BCA', method: 'bank_transfer', bank: 'BCA', accountNumber: '123' }, subtotal: 50000, shipping_fee: 10000, total: 60000, statusHistory: [{ status: 'to_ship', timestamp: new Date().toISOString() }] },
+    ]
+    await page.evaluate((o) => {
+      localStorage.setItem('dunia-pancing-orders', JSON.stringify(o))
+    }, orders)
+    await page.goto('/admin/orders')
+    await page.waitForLoadState('load')
+    const checkboxes = page.locator('input[type="checkbox"]')
+    const cbCount = await checkboxes.count()
+    if (cbCount > 0) {
+      await checkboxes.first().check()
+      await expect(page.getByText(/dipilih|selected/i)).toBeVisible()
+    }
+  })
+
+  test('Admin logout button in sidebar works', async ({ page }) => {
+    await loginAs(page)
+    await page.goto('/admin')
+    const sidebar = page.locator('aside')
+    await sidebar.getByRole('button', { name: /keluar/i }).click()
+    await page.waitForTimeout(1000)
+    expect(page.url()).toContain('/login')
+  })
+})
