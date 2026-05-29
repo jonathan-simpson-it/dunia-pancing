@@ -7,9 +7,8 @@
     "brand": "Shikari",
     "specifications": [
       "Carbon Fiber",
-      "210cm",
       "2 Potongan",
-      "Aksi Medium"
+      "Ringan & Responsif"
     ],
     "price_idr": 158422,
     "original_price_idr": 166760,
@@ -25,21 +24,52 @@
     ],
     "weight": 323,
     "stock_qty": 75,
-    "description_id": "Joran Shikari berkualitas tinggi dengan konstruksi Carbon Fiber, 210cm, 2 Potongan, Aksi Medium yang kokoh. Cocok untuk memancing di perairan Palembang dan sekitarnya. Ringan dan responsif.",
-    "description_en": "High-quality Shikari fishing rod with sturdy Carbon Fiber, 210cm, 2 Potongan, Aksi Medium construction. Perfect for fishing in Palembang and surrounding waters. Lightweight and responsive.",
+    "description_id": "Joran Shikari berkualitas tinggi dengan konstruksi Carbon Fiber dan Aksi Medium yang kokoh. Cocok untuk memancing di perairan Palembang dan sekitarnya. Ringan dan responsif.",
+    "description_en": "High-quality Shikari fishing rod with sturdy Carbon Fiber and Medium Action construction. Perfect for fishing in Palembang and surrounding waters. Lightweight and responsive.",
     "key_features": [
-      [
-        "Carbon Fiber, 210cm, 2 Potongan"
-      ],
-      [
-        "Garansi 30 Hari"
-      ],
-      [
-        "Pengiriman Cepat ke Seluruh Indonesia"
-      ],
-      [
-        "Produk Original 100%"
-      ]
+      ["Carbon Fiber"],
+      ["Garansi 30 Hari"],
+      ["Pengiriman Cepat ke Seluruh Indonesia"],
+      ["Produk Original 100%"]
+    ],
+    "variantTypes": [
+      {
+        "id": "vt-panjang",
+        "name": "Panjang",
+        "values": [
+          { "id": "vv-180", "label": "180cm" },
+          { "id": "vv-210", "label": "210cm" },
+          { "id": "vv-240", "label": "240cm" }
+        ]
+      },
+      {
+        "id": "vt-aksi",
+        "name": "Aksi",
+        "values": [
+          { "id": "vv-fast", "label": "Fast" },
+          { "id": "vv-medium", "label": "Medium" },
+          { "id": "vv-slow", "label": "Slow" }
+        ]
+      }
+    ],
+    "variants": [
+      { "id": "pv-1", "sku": "SKR-180F", "combination": { "vt-panjang": "vv-180", "vt-aksi": "vv-fast" }, "price_idr": 145000, "stock_qty": 12, "weight": 300, "measurements": { "Panjang": "180cm", "Berat": "300g" } },
+      { "id": "pv-2", "sku": "SKR-180M", "combination": { "vt-panjang": "vv-180", "vt-aksi": "vv-medium" }, "price_idr": 150000, "stock_qty": 20, "weight": 310 },
+      { "id": "pv-3", "sku": "SKR-210F", "combination": { "vt-panjang": "vv-210", "vt-aksi": "vv-fast" }, "price_idr": 158422, "original_price_idr": 166760, "stock_qty": 15, "weight": 323, "measurements": { "Panjang": "210cm", "Berat": "323g" } },
+      { "id": "pv-4", "sku": "SKR-210M", "combination": { "vt-panjang": "vv-210", "vt-aksi": "vv-medium" }, "price_idr": 160000, "stock_qty": 18, "weight": 330 },
+      { "id": "pv-5", "sku": "SKR-240S", "combination": { "vt-panjang": "vv-240", "vt-aksi": "vv-slow" }, "price_idr": 175000, "stock_qty": 10, "weight": 350, "measurements": { "Panjang": "240cm", "Berat": "350g" } }
+    ],
+    "features": [
+      { "id": "f-return", "label": "Bebas Pengembalian", "icon": "🔄" },
+      { "id": "f-damage", "label": "Proteksi Kerusakan+", "icon": "🛡️" },
+      { "id": "f-original", "label": "Produk Original 100%", "icon": "✅" }
+    ],
+    "wishlistCount": 15600,
+    "shippingEstimateDays": { "min": 3, "max": 7 },
+    "sizeChart": [
+      { "label": "180cm", "values": { "Panjang Total": "180 cm", "Aksi": "Fast/Medium", "Material": "Carbon Fiber", "Potongan": "2" } },
+      { "label": "210cm", "values": { "Panjang Total": "210 cm", "Aksi": "Fast/Medium", "Material": "Carbon Fiber", "Potongan": "2" } },
+      { "label": "240cm", "values": { "Panjang Total": "240 cm", "Aksi": "Slow", "Material": "Carbon Fiber", "Potongan": "3" } }
     ]
   },
   {
@@ -82,7 +112,16 @@
       [
         "Produk Original 100%"
       ]
-    ]
+    ],
+    "variantTypes": [],
+    "variants": [],
+    "features": [
+      { "id": "f-return2", "label": "Bebas Pengembalian", "icon": "🔄" },
+      { "id": "f-damage2", "label": "Proteksi Kerusakan+", "icon": "🛡️" }
+    ],
+    "wishlistCount": 8200,
+    "shippingEstimateDays": { "min": 2, "max": 5 },
+    "sizeChart": []
   },
   {
     "id": "dp-004",

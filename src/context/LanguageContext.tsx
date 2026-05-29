@@ -10,20 +10,24 @@ const LanguageContext = createContext<LanguageContextValue>(null!)
 const STORAGE_KEY = 'dunia-pancing-lang'
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<'id' | 'en'>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      return stored === 'en' ? 'en' : 'id'
-    } catch {
-      return 'id'
-    }
-  })
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, lang)
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored === 'en') setLang('en')
     } catch { /* noop */ }
-  }, [lang])
+    setReady(true)
+  }, [])
+
+  useEffect(() => {
+    if (ready) {
+      try {
+        localStorage.setItem(STORAGE_KEY, lang)
+      } catch { /* noop */ }
+    }
+  }, [lang, ready])
 
   const toggleLang = () => setLang(l => l === 'id' ? 'en' : 'id')
 

@@ -7,6 +7,9 @@ import { useLang } from '../context/LanguageContext'
 import { useProducts } from '../context/ProductStore'
 import { useAuth } from '../context/AuthContext'
 import ImageUploader from '../components/ui/ImageUploader'
+import VariantBuilder from '../components/ui/VariantBuilder'
+import FeatureEditor from '../components/ui/FeatureEditor'
+import type { VariantType, ProductVariant, ProductFeature } from '../types'
 import id from '../locales/id.json'
 import en from '../locales/en.json'
 
@@ -24,8 +27,14 @@ export default function AdminAddProduct() {
     price_idr: '', original_price_idr: '', stock_qty: '',
     weight: '', specifications: '', description_id: '', description_en: '',
     images: [] as string[],
+    shippingEstimateMin: '3',
+    shippingEstimateMax: '7',
   })
+  const [variantTypes, setVariantTypes] = useState<VariantType[]>([])
+  const [variants, setVariants] = useState<ProductVariant[]>([])
+  const [features, setFeatures] = useState<ProductFeature[]>([])
   const [success, setSuccess] = useState(false)
+  const [showVariants, setShowVariants] = useState(false)
 
   const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm({ ...form, [field]: e.target.value })
@@ -61,6 +70,15 @@ export default function AdminAddProduct() {
       image: images[0],
       images,
       key_features: [],
+      variantTypes,
+      variants,
+      features,
+      wishlistCount: 0,
+      shippingEstimateDays: {
+        min: Number(form.shippingEstimateMin) || 3,
+        max: Number(form.shippingEstimateMax) || 7,
+      },
+      sizeChart: [],
     })
 
     setSuccess(true)
@@ -138,6 +156,46 @@ export default function AdminAddProduct() {
               <div className="sm:col-span-2">
                 <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('admin_form_desc_en', lang)}</label>
                 <textarea value={form.description_en} onChange={update('description_en')} rows={3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 resize-none" />
+              </div>
+
+              <div className="sm:col-span-2">
+                <h3 className="text-[13px] font-bold text-slate-900 mb-3">{lang === 'id' ? 'Pengiriman' : 'Shipping'}</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[12px] font-semibold text-slate-700 mb-1">{lang === 'id' ? 'Estimasi Min (hari)' : 'Estimate Min (days)'}</label>
+                    <input type="number" value={form.shippingEstimateMin} onChange={update('shippingEstimateMin')} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30" min={1} />
+                  </div>
+                  <div>
+                    <label className="block text-[12px] font-semibold text-slate-700 mb-1">{lang === 'id' ? 'Estimasi Max (hari)' : 'Estimate Max (days)'}</label>
+                    <input type="number" value={form.shippingEstimateMax} onChange={update('shippingEstimateMax')} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30" min={1} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="sm:col-span-2">
+                <FeatureEditor features={features} onChange={setFeatures} />
+              </div>
+
+              <div className="sm:col-span-2">
+                <button
+                  type="button"
+                  onClick={() => setShowVariants(!showVariants)}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 text-[12px] font-bold rounded-lg hover:bg-slate-200 transition-all"
+                >
+                  {showVariants
+                    ? (lang === 'id' ? 'Sembunyikan Varian' : 'Hide Variants')
+                    : (lang === 'id' ? 'Atur Varian Produk' : 'Manage Product Variants')}
+                </button>
+                {showVariants && (
+                  <VariantBuilder
+                    variantTypes={variantTypes}
+                    variants={variants}
+                    onChange={(newTypes, newVariants) => {
+                      setVariantTypes(newTypes)
+                      setVariants(newVariants)
+                    }}
+                  />
+                )}
               </div>
             </div>
 

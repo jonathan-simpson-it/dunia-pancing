@@ -3,7 +3,7 @@ import type { CartItem, Product } from '../types'
 
 interface CartContextValue {
   items: CartItem[]
-  addToCart: (product: Product, qty?: number) => void
+  addToCart: (product: Product, qty?: number, variantId?: string, variantLabel?: string) => void
   removeFromCart: (productId: string) => void
   updateQty: (productId: string, qty: number) => void
   clearCart: () => void
@@ -40,27 +40,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, loaded])
 
-  const addToCart = useCallback((product: Product, qty = 1) => {
+  const addToCart = useCallback((product: Product, qty = 1, variantId?: string, variantLabel?: string) => {
     setItems(prev => {
-      const existing = prev.find(item => item.id === product.id)
+      const cartId = variantId ? product.id + '::' + variantId : product.id
+      const existing = prev.find(item => {
+        const itemCartId = item.variantId ? item.id + '::' + item.variantId : item.id
+        return itemCartId === cartId
+      })
       if (existing) {
-        return prev.map(item =>
-          item.id === product.id
-            ? { ...item, qty: Math.min(item.qty + qty, product.stock_qty || 99) }
+        return prev.map(item => {
+          const itemCartId = item.variantId ? item.id + '::' + item.variantId : item.id
+          return itemCartId === cartId
+            ? { ...item, qty: Math.min(item.qty + qty, item.stock_qty || 99) }
             : item
-        )
+        })
       }
       return [...prev, {
         id: product.id,
         name_id: product.name_id,
         name_en: product.name_en,
-        image: product.image,
+        image: variantId ? (product.variants?.find(v => v.id === variantId)?.image || product.image) : product.image,
         price_idr: product.price_idr,
         original_price_idr: product.original_price_idr,
         stock_qty: product.stock_qty || 99,
         category: product.category,
         brand: product.brand,
         qty,
+        variantId,
+        variantLabel,
       }]
     })
   }, [])

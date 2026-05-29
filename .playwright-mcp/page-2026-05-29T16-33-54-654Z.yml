@@ -1,0 +1,509 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e5]:
+        - link "DUNIA PANCING Palembang • Indonesia" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]:
+            - generic [ref=e12]: DUNIA PANCING
+            - generic [ref=e13]: Palembang • Indonesia
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - link "Beranda" [ref=e16] [cursor=pointer]:
+              - /url: /
+            - link "Katalog" [ref=e17] [cursor=pointer]:
+              - /url: /catalog
+            - link "Blog" [ref=e18] [cursor=pointer]:
+              - /url: /blog
+            - link "Kontak" [ref=e19] [cursor=pointer]:
+              - /url: /contact
+            - link "Dashboard" [ref=e179] [cursor=pointer]:
+              - /url: /admin
+          - link [ref=e180] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e181]
+          - link "Admin" [ref=e183] [cursor=pointer]:
+            - /url: /admin
+          - link [ref=e21] [cursor=pointer]:
+            - /url: /cart
+            - img [ref=e22]
+          - button "ID EN" [ref=e25]:
+            - generic [ref=e26]: ID
+            - generic [ref=e28]: EN
+    - main [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - img "Fishing Background" [ref=e33]
+          - generic [ref=e36]:
+            - generic [ref=e41]: Premium Angling Supplies
+            - heading "Pusat Alat Pancing Terlengkap di Palembang" [level=1] [ref=e42]
+            - paragraph [ref=e43]: Joran, Reel, Senar, Kail, Umpan & Aksesoris — Melayani Eceran dan Grosir
+            - generic [ref=e44]:
+              - link "Lihat Katalog" [ref=e45] [cursor=pointer]:
+                - /url: /catalog
+              - link "Kunjungi Shopee" [ref=e46] [cursor=pointer]:
+                - /url: https://shopee.co.id/alphastore1
+            - generic [ref=e47]:
+              - generic [ref=e48]:
+                - generic [ref=e49]: 2k+
+                - generic [ref=e50]: Products
+              - generic [ref=e51]:
+                - generic [ref=e52]: 10k+
+                - generic [ref=e53]: Customers
+              - generic [ref=e54]:
+                - generic [ref=e55]: 15y
+                - generic [ref=e56]: Experience
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - text: Browse Collections
+            - heading "Kategori Produk" [level=2] [ref=e59]
+          - generic [ref=e184]:
+            - link "🎣 Joran 8 Barang" [ref=e185] [cursor=pointer]:
+              - /url: /catalog?category=rods
+              - generic [ref=e186]: 🎣
+              - generic [ref=e187]:
+                - generic [ref=e188]: Joran
+                - generic [ref=e189]: 8 Barang
+            - link "🔄 Reel 7 Barang" [ref=e190] [cursor=pointer]:
+              - /url: /catalog?category=reels
+              - generic [ref=e191]: 🔄
+              - generic [ref=e192]:
+                - generic [ref=e193]: Reel
+                - generic [ref=e194]: 7 Barang
+            - link "〰️ Senar 8 Barang" [ref=e195] [cursor=pointer]:
+              - /url: /catalog?category=lines
+              - generic [ref=e196]: 〰️
+              - generic [ref=e197]:
+                - generic [ref=e198]: Senar
+                - generic [ref=e199]: 8 Barang
+            - link "🪝 Kail 7 Barang" [ref=e200] [cursor=pointer]:
+              - /url: /catalog?category=hooks
+              - generic [ref=e201]: 🪝
+              - generic [ref=e202]:
+                - generic [ref=e203]: Kail
+                - generic [ref=e204]: 7 Barang
+            - link "🐟 Umpan 10 Barang" [ref=e205] [cursor=pointer]:
+              - /url: /catalog?category=lures
+              - generic [ref=e206]: 🐟
+              - generic [ref=e207]:
+                - generic [ref=e208]: Umpan
+                - generic [ref=e209]: 10 Barang
+            - link "🧰 Aksesoris 11 Barang" [ref=e210] [cursor=pointer]:
+              - /url: /catalog?category=accessories
+              - generic [ref=e211]: 🧰
+              - generic [ref=e212]:
+                - generic [ref=e213]: Aksesoris
+                - generic [ref=e214]: 11 Barang
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - text: Top Picks
+              - heading "Produk Unggulan" [level=2] [ref=e64]
+              - paragraph [ref=e65]: Professional grade equipment tested for performance and durability in Palembang waters.
+            - link "Explore Catalog" [ref=e66] [cursor=pointer]:
+              - /url: /catalog
+              - text: Explore Catalog
+              - img [ref=e67]
+          - generic [ref=e215]:
+            - generic [ref=e216]:
+              - generic [ref=e217]:
+                - link "Joran 21 Shikari Joran 21 Shikari Joran 21 Shikari" [ref=e218] [cursor=pointer]:
+                  - /url: /product/dp-002
+                  - img "Joran 21 Shikari" [ref=e219]
+                  - img "Joran 21 Shikari" [ref=e220]
+                  - img "Joran 21 Shikari" [ref=e221]
+                - generic [ref=e222]: "-5%"
+                - button [ref=e223]:
+                  - img [ref=e224]
+                - button [ref=e226]:
+                  - img [ref=e227]
+                - generic [ref=e229]:
+                  - button [ref=e230]
+                  - button [ref=e231]
+                  - button [ref=e232]
+              - generic [ref=e233]:
+                - link "Joran 21 Shikari" [ref=e234] [cursor=pointer]:
+                  - /url: /product/dp-002
+                  - heading "Joran 21 Shikari" [level=3] [ref=e235]
+                - generic [ref=e236]:
+                  - generic [ref=e237]: Rp 166.760
+                  - text: Rp 158.422
+                - generic [ref=e238]:
+                  - generic [ref=e239]:
+                    - generic [ref=e240]:
+                      - generic [ref=e241]: ★
+                      - generic [ref=e242]: ★
+                      - generic [ref=e243]: ★
+                      - generic [ref=e244]: ★
+                      - generic [ref=e245]: ★
+                    - generic [ref=e246]: "3.6"
+                  - generic [ref=e247]: Terjual 1.1rb
+                - link "Beli Langsung" [ref=e248] [cursor=pointer]:
+                  - /url: /product/dp-002
+                  - img [ref=e249]
+                  - text: Beli Langsung
+            - generic [ref=e252]:
+              - generic [ref=e253]:
+                - link "Joran Spinning Kaito 98 Joran Spinning Kaito 98 Joran Spinning Kaito 98" [ref=e254] [cursor=pointer]:
+                  - /url: /product/dp-003
+                  - img "Joran Spinning Kaito 98" [ref=e255]
+                  - img "Joran Spinning Kaito 98" [ref=e256]
+                  - img "Joran Spinning Kaito 98" [ref=e257]
+                - generic [ref=e258]: "-16%"
+                - button [ref=e259]:
+                  - img [ref=e260]
+                - button [ref=e262]:
+                  - img [ref=e263]
+                - generic [ref=e265]:
+                  - button [ref=e266]
+                  - button [ref=e267]
+                  - button [ref=e268]
+              - generic [ref=e269]:
+                - link "Joran Spinning Kaito 98" [ref=e270] [cursor=pointer]:
+                  - /url: /product/dp-003
+                  - heading "Joran Spinning Kaito 98" [level=3] [ref=e271]
+                - generic [ref=e272]:
+                  - generic [ref=e273]: Rp 361.393
+                  - text: Rp 303.570
+                - generic [ref=e274]:
+                  - generic [ref=e275]:
+                    - generic [ref=e276]:
+                      - generic [ref=e277]: ★
+                      - generic [ref=e278]: ★
+                      - generic [ref=e279]: ★
+                      - generic [ref=e280]: ★
+                      - generic [ref=e281]: ★
+                    - generic [ref=e282]: "4.2"
+                  - generic [ref=e283]: Terjual 1.2rb
+                - link "Beli Langsung" [ref=e284] [cursor=pointer]:
+                  - /url: /product/dp-003
+                  - img [ref=e285]
+                  - text: Beli Langsung
+            - generic [ref=e288]:
+              - generic [ref=e289]:
+                - link "Joran Casting Fantastik 50 Joran Casting Fantastik 50 Joran Casting Fantastik 50" [ref=e290] [cursor=pointer]:
+                  - /url: /product/dp-004
+                  - img "Joran Casting Fantastik 50" [ref=e291]
+                  - img "Joran Casting Fantastik 50" [ref=e292]
+                  - img "Joran Casting Fantastik 50" [ref=e293]
+                - generic [ref=e294]: "-16%"
+                - button [ref=e295]:
+                  - img [ref=e296]
+                - button [ref=e298]:
+                  - img [ref=e299]
+                - generic [ref=e301]:
+                  - button [ref=e302]
+                  - button [ref=e303]
+                  - button [ref=e304]
+              - generic [ref=e305]:
+                - link "Joran Casting Fantastik 50" [ref=e306] [cursor=pointer]:
+                  - /url: /product/dp-004
+                  - heading "Joran Casting Fantastik 50" [level=3] [ref=e307]
+                - generic [ref=e308]:
+                  - generic [ref=e309]: Rp 642.051
+                  - text: Rp 539.323
+                - generic [ref=e310]:
+                  - generic [ref=e311]:
+                    - generic [ref=e312]:
+                      - generic [ref=e313]: ★
+                      - generic [ref=e314]: ★
+                      - generic [ref=e315]: ★
+                      - generic [ref=e316]: ★
+                      - generic [ref=e317]: ★
+                    - generic [ref=e318]: "4.5"
+                  - generic [ref=e319]: Terjual 2.1rb
+                - link "Beli Langsung" [ref=e320] [cursor=pointer]:
+                  - /url: /product/dp-004
+                  - img [ref=e321]
+                  - text: Beli Langsung
+            - generic [ref=e324]:
+              - generic [ref=e325]:
+                - link "Joran Trolling Serenity 30 Joran Trolling Serenity 30 Joran Trolling Serenity 30" [ref=e326] [cursor=pointer]:
+                  - /url: /product/dp-005
+                  - img "Joran Trolling Serenity 30" [ref=e327]
+                  - img "Joran Trolling Serenity 30" [ref=e328]
+                  - img "Joran Trolling Serenity 30" [ref=e329]
+                - generic [ref=e330]: "-5%"
+                - button [ref=e331]:
+                  - img [ref=e332]
+                - button [ref=e334]:
+                  - img [ref=e335]
+                - generic [ref=e337]:
+                  - button [ref=e338]
+                  - button [ref=e339]
+                  - button [ref=e340]
+              - generic [ref=e341]:
+                - link "Joran Trolling Serenity 30" [ref=e342] [cursor=pointer]:
+                  - /url: /product/dp-005
+                  - heading "Joran Trolling Serenity 30" [level=3] [ref=e343]
+                - generic [ref=e344]:
+                  - generic [ref=e345]: Rp 829.580
+                  - text: Rp 788.101
+                - generic [ref=e346]:
+                  - generic [ref=e347]:
+                    - generic [ref=e348]:
+                      - generic [ref=e349]: ★
+                      - generic [ref=e350]: ★
+                      - generic [ref=e351]: ★
+                      - generic [ref=e352]: ★
+                      - generic [ref=e353]: ★
+                    - generic [ref=e354]: "3.4"
+                  - generic [ref=e355]: Terjual 1.3rb
+                - link "Beli Langsung" [ref=e356] [cursor=pointer]:
+                  - /url: /product/dp-005
+                  - img [ref=e357]
+                  - text: Beli Langsung
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - text: Best Sellers
+              - heading "Paling Laris" [level=2] [ref=e73]
+              - paragraph [ref=e74]: Produk paling populer yang menjadi favorit pelanggan
+            - link "Lihat Semua" [ref=e75] [cursor=pointer]:
+              - /url: /catalog?sort=bestseller
+              - text: Lihat Semua
+              - img [ref=e76]
+          - generic [ref=e78]:
+            - generic [ref=e360]:
+              - generic [ref=e361]:
+                - link "Rompi Pancing Frabill 13 Rompi Pancing Frabill 13 Rompi Pancing Frabill 13" [ref=e362] [cursor=pointer]:
+                  - /url: /product/dp-045
+                  - img "Rompi Pancing Frabill 13" [ref=e363]
+                  - img "Rompi Pancing Frabill 13" [ref=e364]
+                  - img "Rompi Pancing Frabill 13" [ref=e365]
+                - generic [ref=e366]: "-38%"
+                - button [ref=e367]:
+                  - img [ref=e368]
+                - button [ref=e370]:
+                  - img [ref=e371]
+                - generic [ref=e373]:
+                  - button [ref=e374]
+                  - button [ref=e375]
+                  - button [ref=e376]
+              - generic [ref=e377]:
+                - link "Rompi Pancing Frabill 13" [ref=e378] [cursor=pointer]:
+                  - /url: /product/dp-045
+                  - heading "Rompi Pancing Frabill 13" [level=3] [ref=e379]
+                - generic [ref=e380]:
+                  - generic [ref=e381]: Rp 316.025
+                  - text: Rp 195.936
+                - generic [ref=e382]:
+                  - generic [ref=e383]:
+                    - generic [ref=e384]:
+                      - generic [ref=e385]: ★
+                      - generic [ref=e386]: ★
+                      - generic [ref=e387]: ★
+                      - generic [ref=e388]: ★
+                      - generic [ref=e389]: ★
+                    - generic [ref=e390]: "3.9"
+                  - generic [ref=e391]: Terjual 2.5rb
+                - link "Beli Langsung" [ref=e392] [cursor=pointer]:
+                  - /url: /product/dp-045
+                  - img [ref=e393]
+                  - text: Beli Langsung
+            - generic [ref=e396]:
+              - generic [ref=e397]:
+                - link "Joran Tegek Shimano 46m Joran Tegek Shimano 46m Joran Tegek Shimano 46m" [ref=e398] [cursor=pointer]:
+                  - /url: /product/dp-006
+                  - img "Joran Tegek Shimano 46m" [ref=e399]
+                  - img "Joran Tegek Shimano 46m" [ref=e400]
+                  - img "Joran Tegek Shimano 46m" [ref=e401]
+                - generic [ref=e402]: "-12%"
+                - button [ref=e403]:
+                  - img [ref=e404]
+                - button [ref=e406]:
+                  - img [ref=e407]
+                - generic [ref=e409]:
+                  - button [ref=e410]
+                  - button [ref=e411]
+                  - button [ref=e412]
+              - generic [ref=e413]:
+                - link "Joran Tegek Shimano 46m" [ref=e414] [cursor=pointer]:
+                  - /url: /product/dp-006
+                  - heading "Joran Tegek Shimano 46m" [level=3] [ref=e415]
+                - generic [ref=e416]:
+                  - generic [ref=e417]: Rp 615.103
+                  - text: Rp 541.291
+                - generic [ref=e418]:
+                  - generic [ref=e419]:
+                    - generic [ref=e420]:
+                      - generic [ref=e421]: ★
+                      - generic [ref=e422]: ★
+                      - generic [ref=e423]: ★
+                      - generic [ref=e424]: ★
+                      - generic [ref=e425]: ★
+                    - generic [ref=e426]: "4.5"
+                  - generic [ref=e427]: Terjual 2.4rb
+                - link "Beli Langsung" [ref=e428] [cursor=pointer]:
+                  - /url: /product/dp-006
+                  - img [ref=e429]
+                  - text: Beli Langsung
+            - generic [ref=e432]:
+              - generic [ref=e433]:
+                - link "Joran Ultra Light Okuma 65 Joran Ultra Light Okuma 65 Joran Ultra Light Okuma 65" [ref=e434] [cursor=pointer]:
+                  - /url: /product/dp-008
+                  - img "Joran Ultra Light Okuma 65" [ref=e435]
+                  - img "Joran Ultra Light Okuma 65" [ref=e436]
+                  - img "Joran Ultra Light Okuma 65" [ref=e437]
+                - generic [ref=e438]: "-37%"
+                - button [ref=e439]:
+                  - img [ref=e440]
+                - button [ref=e442]:
+                  - img [ref=e443]
+                - generic [ref=e445]:
+                  - button [ref=e446]
+                  - button [ref=e447]
+                  - button [ref=e448]
+              - generic [ref=e449]:
+                - link "Joran Ultra Light Okuma 65" [ref=e450] [cursor=pointer]:
+                  - /url: /product/dp-008
+                  - heading "Joran Ultra Light Okuma 65" [level=3] [ref=e451]
+                - generic [ref=e452]:
+                  - generic [ref=e453]: Rp 156.000
+                  - text: Rp 98.280
+                - generic [ref=e454]:
+                  - generic [ref=e455]:
+                    - generic [ref=e456]:
+                      - generic [ref=e457]: ★
+                      - generic [ref=e458]: ★
+                      - generic [ref=e459]: ★
+                      - generic [ref=e460]: ★
+                      - generic [ref=e461]: ★
+                    - generic [ref=e462]: "4.7"
+                  - generic [ref=e463]: Terjual 2.4rb
+                - link "Beli Langsung" [ref=e464] [cursor=pointer]:
+                  - /url: /product/dp-008
+                  - img [ref=e465]
+                  - text: Beli Langsung
+            - generic [ref=e468]:
+              - generic [ref=e469]:
+                - link "Kail Circle Mustad 32pcs Kail Circle Mustad 32pcs Kail Circle Mustad 32pcs" [ref=e470] [cursor=pointer]:
+                  - /url: /product/dp-026
+                  - img "Kail Circle Mustad 32pcs" [ref=e471]
+                  - img "Kail Circle Mustad 32pcs" [ref=e472]
+                  - img "Kail Circle Mustad 32pcs" [ref=e473]
+                - generic [ref=e474]: "-39%"
+                - button [ref=e475]:
+                  - img [ref=e476]
+                - button [ref=e478]:
+                  - img [ref=e479]
+                - generic [ref=e481]:
+                  - button [ref=e482]
+                  - button [ref=e483]
+                  - button [ref=e484]
+              - generic [ref=e485]:
+                - link "Kail Circle Mustad 32pcs" [ref=e486] [cursor=pointer]:
+                  - /url: /product/dp-026
+                  - heading "Kail Circle Mustad 32pcs" [level=3] [ref=e487]
+                - generic [ref=e488]:
+                  - generic [ref=e489]: Rp 471.161
+                  - text: Rp 287.408
+                - generic [ref=e490]:
+                  - generic [ref=e491]:
+                    - generic [ref=e492]:
+                      - generic [ref=e493]: ★
+                      - generic [ref=e494]: ★
+                      - generic [ref=e495]: ★
+                      - generic [ref=e496]: ★
+                      - generic [ref=e497]: ★
+                    - generic [ref=e498]: "3.3"
+                  - generic [ref=e499]: Terjual 2.3rb
+                - link "Beli Langsung" [ref=e500] [cursor=pointer]:
+                  - /url: /product/dp-026
+                  - img [ref=e501]
+                  - text: Beli Langsung
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - img [ref=e84]
+            - heading "Barang Asli" [level=3] [ref=e86]
+            - paragraph [ref=e87]: Semua produk bersertifikat asli dari brand resmi.
+          - generic [ref=e88]:
+            - img [ref=e90]
+            - heading "Pengiriman Cepat" [level=3] [ref=e92]
+            - paragraph [ref=e93]: Proses pesanan di hari yang sama untuk area Palembang.
+          - generic [ref=e94]:
+            - img [ref=e96]
+            - heading "Konsultasi Gratis" [level=3] [ref=e98]
+            - paragraph [ref=e99]: Hubungi kami untuk rekomendasi alat pancing yang tepat.
+        - generic [ref=e102]:
+          - generic [ref=e106]:
+            - img "Shop Interior" [ref=e107]
+            - generic [ref=e109]:
+              - generic [ref=e110]: 25+
+              - generic [ref=e111]: Years of Excellence
+          - generic [ref=e112]:
+            - generic [ref=e113]: Dedicated Partner
+            - heading "Mitra Terpercaya Sejak 1998" [level=2] [ref=e114]
+            - generic [ref=e115]:
+              - paragraph [ref=e116]: Berdiri di jantung kota Palembang, Dunia Pancing telah menjadi standar bagi komunitas pemancing. Kami memahami bahwa setiap tarikan memerlukan alat yang presisi.
+              - paragraph [ref=e117]: Kami bangga menjadi dealer resmi brand internasional, menjamin keaslian dan layanan purna jual yang tidak bisa Anda temukan di tempat lain.
+            - generic [ref=e118]:
+              - link "Shop Now" [ref=e119] [cursor=pointer]:
+                - /url: /catalog
+              - link "Kontak" [ref=e120] [cursor=pointer]:
+                - /url: /contact
+    - contentinfo [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]:
+              - img [ref=e127]
+              - generic [ref=e129]:
+                - generic [ref=e130]: DUNIA PANCING
+                - generic [ref=e131]: Palembang
+            - paragraph [ref=e132]: Mitra terpercaya pemancing di Palembang sejak 1998. Kami menghadirkan kualitas tingkat dunia untuk hobi memancing Anda.
+            - generic [ref=e133]:
+              - link "facebook" [ref=e134] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e135]: facebook
+              - link "instagram" [ref=e137] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e138]: instagram
+              - link "youtube" [ref=e140] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e141]: youtube
+          - generic [ref=e143]:
+            - heading "Navigation" [level=4] [ref=e144]
+            - list [ref=e145]:
+              - listitem [ref=e146]:
+                - link "Home" [ref=e147] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e148]:
+                - link "Digital Catalog" [ref=e149] [cursor=pointer]:
+                  - /url: /catalog
+              - listitem [ref=e150]:
+                - link "Blog" [ref=e151] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e152]:
+                - link "Visit Store" [ref=e153] [cursor=pointer]:
+                  - /url: /contact
+          - generic [ref=e154]:
+            - heading "Legal" [level=4] [ref=e155]
+            - list [ref=e156]:
+              - listitem [ref=e157]:
+                - link "Terms of Service" [ref=e158] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e159]:
+                - link "Privacy Policy" [ref=e160] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e161]:
+                - link "Warranty Info" [ref=e162] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e163]:
+            - heading "Newsletter" [level=4] [ref=e164]
+            - paragraph [ref=e165]: Get stock updates and pro tips.
+            - generic [ref=e166]:
+              - textbox "Email address" [ref=e167]
+              - button [ref=e168]:
+                - img [ref=e169]
+        - generic [ref=e171]:
+          - paragraph [ref=e172]: © 2024 DUNIA PANCING PALEMBANG. ALL RIGHTS RESERVED.
+          - generic [ref=e174]: Secure Payments via Shopee
+    - button "Buka Chat" [ref=e175]:
+      - img [ref=e176]
+      - generic [ref=e178]: Chat
+      - generic [ref=e504]: "1"
+  - button "Open Next.js Dev Tools" [ref=e510] [cursor=pointer]:
+    - img [ref=e511]
+  - alert [ref=e514]

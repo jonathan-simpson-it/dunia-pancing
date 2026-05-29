@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react'
-import type { Product, Category, PriceUpdate, ImportResult } from '../types'
+import type { Product, Category, PriceUpdate, ImportResult, ProductVariant, VariantType, ProductFeature } from '../types'
 import seed from '../data/seed.json'
 
 interface ProductContextValue {
@@ -17,6 +17,18 @@ interface ProductContextValue {
   getCategoryName: (key: string, lang: 'id' | 'en') => string
   categoryKeys: Record<string, string>
   loaded: boolean
+  getActiveVariant: (productId: string, combination: Record<string, string>) => ProductVariant | null
+  addVariantType: (productId: string, variantType: VariantType) => void
+  updateVariantType: (productId: string, typeId: string, updates: Partial<VariantType>) => void
+  removeVariantType: (productId: string, typeId: string) => void
+  addVariantValue: (productId: string, typeId: string, value: VariantType['values'][0]) => void
+  updateVariantValue: (productId: string, typeId: string, valueId: string, updates: Partial<VariantType['values'][0]>) => void
+  removeVariantValue: (productId: string, typeId: string, valueId: string) => void
+  updateVariant: (productId: string, variantId: string, updates: Partial<ProductVariant>) => void
+  addFeature: (productId: string, feature: ProductFeature) => void
+  removeFeature: (productId: string, featureId: string) => void
+  getWishlist: (username: string) => string[]
+  toggleWishlist: (username: string, productId: string) => boolean
 }
 
 const ProductContext = createContext<ProductContextValue>(null!)
@@ -32,13 +44,26 @@ const DEFAULT_CATEGORIES: Category[] = [
   { key: 'accessories', name_id: 'Aksesoris', name_en: 'Accessories', icon: '🧰' },
 ]
 
+function migrateProduct(p: any): Product {
+  return {
+    ...p,
+    variantTypes: p.variantTypes || [],
+    variants: p.variants || [],
+    features: p.features || [],
+    wishlistCount: p.wishlistCount || 0,
+    shippingEstimateDays: p.shippingEstimateDays || { min: 3, max: 7 },
+    sizeChart: p.sizeChart || [],
+  }
+}
+
 function loadProducts(): Product[] {
   try {
     const raw = localStorage.getItem(PRODUCTS_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) return JSON.parse(raw).map(migrateProduct)
   } catch { /* noop */ }
-  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(seed))
-  return seed as Product[]
+  const seeded = (seed as any[]).map(migrateProduct)
+  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(seeded))
+  return seeded as Product[]
 }
 
 function loadCategories(): Category[] {
@@ -148,6 +173,131 @@ export function ProductStoreProvider({ children }: { children: ReactNode }) {
     return map
   }, [categories])
 
+  const getActiveVariant = useCallback((productId: string, combination: Record<string, string>): ProductVariant | null => {
+    const product = products.find(p => p.id === productId)
+    if (!product || !product.variants) return null
+    return product.variants.find(v =>
+      Object.entries(combination).every(([key, val]) => v.combination[key] === val)
+    ) || null
+  }, [products])
+
+  const addVariantType = useCallback((productId: string, variantType: VariantType) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? { ...p, variantTypes: [...(p.variantTypes || []), variantType] }
+        : p
+    ))
+  }, [])
+
+  const updateVariantType = useCallback((productId: string, typeId: string, updates: Partial<VariantType>) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? { ...p, variantTypes: (p.variantTypes || []).map(vt => vt.id === typeId ? { ...vt, ...updates } : vt) }
+        : p
+    ))
+  }, [])
+
+  const removeVariantType = useCallback((productId: string, typeId: string) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? { ...p, variantTypes: (p.variantTypes || []).filter(vt => vt.id !== typeId) }
+        : p
+    ))
+  }, [])
+
+  const addVariantValue = useCallback((productId: string, typeId: string, value: VariantType['values'][0]) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? {
+            ...p,
+            variantTypes: (p.variantTypes || []).map(vt =>
+              vt.id === typeId ? { ...vt, values: [...vt.values, value] } : vt
+            )
+          }
+        : p
+    ))
+  }, [])
+
+  const updateVariantValue = useCallback((productId: string, typeId: string, valueId: string, updates: Partial<VariantType['values'][0]>) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? {
+            ...p,
+            variantTypes: (p.variantTypes || []).map(vt =>
+              vt.id === typeId
+                ? { ...vt, values: vt.values.map(v => v.id === valueId ? { ...v, ...updates } : v) }
+                : vt
+            )
+          }
+        : p
+    ))
+  }, [])
+
+  const removeVariantValue = useCallback((productId: string, typeId: string, valueId: string) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? {
+            ...p,
+            variantTypes: (p.variantTypes || []).map(vt =>
+              vt.id === typeId
+                ? { ...vt, values: vt.values.filter(v => v.id !== valueId) }
+                : vt
+            )
+          }
+        : p
+    ))
+  }, [])
+
+  const updateVariant = useCallback((productId: string, variantId: string, updates: Partial<ProductVariant>) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? {
+            ...p,
+            variants: (p.variants || []).map(v =>
+              v.id === variantId ? { ...v, ...updates } : v
+            )
+          }
+        : p
+    ))
+  }, [])
+
+  const addFeature = useCallback((productId: string, feature: ProductFeature) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? { ...p, features: [...(p.features || []), feature] }
+        : p
+    ))
+  }, [])
+
+  const removeFeature = useCallback((productId: string, featureId: string) => {
+    setProducts(prev => prev.map(p =>
+      p.id === productId
+        ? { ...p, features: (p.features || []).filter(f => f.id !== featureId) }
+        : p
+    ))
+  }, [])
+
+  const getWishlist = useCallback((username: string): string[] => {
+    if (!username) return []
+    try {
+      const raw = localStorage.getItem('dunia-pancing-wishlist-' + username)
+      return raw ? JSON.parse(raw) : []
+    } catch { return [] }
+  }, [])
+
+  const toggleWishlist = useCallback((username: string, productId: string): boolean => {
+    if (!username) return false
+    const key = 'dunia-pancing-wishlist-' + username
+    const current: string[] = (() => {
+      try { return JSON.parse(localStorage.getItem(key) || '[]') }
+      catch { return [] }
+    })()
+    const exists = current.includes(productId)
+    const next = exists ? current.filter(id => id !== productId) : [...current, productId]
+    localStorage.setItem(key, JSON.stringify(next))
+    return !exists
+  }, [])
+
   return (
     <ProductContext.Provider value={{
       products,
@@ -164,6 +314,18 @@ export function ProductStoreProvider({ children }: { children: ReactNode }) {
       getCategoryName,
       categoryKeys,
       loaded,
+      getActiveVariant,
+      addVariantType,
+      updateVariantType,
+      removeVariantType,
+      addVariantValue,
+      updateVariantValue,
+      removeVariantValue,
+      updateVariant,
+      addFeature,
+      removeFeature,
+      getWishlist,
+      toggleWishlist,
     }}>
       {children}
     </ProductContext.Provider>

@@ -1,3 +1,40 @@
+// ─── Variant System ────────────────────────────────────
+export interface VariantValue {
+  id: string
+  label: string
+  metadata?: Record<string, string>
+}
+
+export interface VariantType {
+  id: string
+  name: string
+  values: VariantValue[]
+}
+
+export interface ProductVariant {
+  id: string
+  sku: string
+  combination: Record<string, string>
+  price_idr: number
+  original_price_idr?: number
+  stock_qty: number
+  weight?: number
+  image?: string
+  images?: string[]
+  measurements?: Record<string, string>
+}
+
+export interface ProductFeature {
+  id: string
+  label: string
+  icon?: string
+}
+
+export interface SizeChartEntry {
+  label: string
+  values: Record<string, string>
+}
+
 // ─── Product ───────────────────────────────────────────
 export interface Product {
   id: string
@@ -19,6 +56,12 @@ export interface Product {
   description_id: string
   description_en: string
   key_features: string[][]
+  variantTypes: VariantType[]
+  variants: ProductVariant[]
+  features: ProductFeature[]
+  wishlistCount: number
+  shippingEstimateDays: { min: number; max: number }
+  sizeChart: SizeChartEntry[]
 }
 
 export interface Category {
@@ -40,6 +83,8 @@ export interface CartItem {
   category: string
   brand: string
   qty: number
+  variantId?: string
+  variantLabel?: string
 }
 
 // ─── Order ─────────────────────────────────────────────

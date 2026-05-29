@@ -1,0 +1,163 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e5]:
+      - link "DUNIA PANCING Palembang • Indonesia" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e8]
+        - generic [ref=e11]:
+          - generic [ref=e12]: DUNIA PANCING
+          - generic [ref=e13]: Palembang • Indonesia
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - link "Beranda" [ref=e16] [cursor=pointer]:
+            - /url: /
+          - link "Katalog" [ref=e17] [cursor=pointer]:
+            - /url: /catalog
+          - link "Blog" [ref=e18] [cursor=pointer]:
+            - /url: /blog
+          - link "Kontak" [ref=e19] [cursor=pointer]:
+            - /url: /contact
+        - link "Masuk" [ref=e20] [cursor=pointer]:
+          - /url: /login
+        - link [ref=e21] [cursor=pointer]:
+          - /url: /cart
+          - img [ref=e22]
+        - button "ID EN" [ref=e25]:
+          - generic [ref=e26]: ID
+          - generic [ref=e28]: EN
+  - main [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - img "Fishing Background" [ref=e33]
+        - generic [ref=e36]:
+          - generic [ref=e41]: Premium Angling Supplies
+          - heading "Pusat Alat Pancing Terlengkap di Palembang" [level=1] [ref=e42]
+          - paragraph [ref=e43]: Joran, Reel, Senar, Kail, Umpan & Aksesoris — Melayani Eceran dan Grosir
+          - generic [ref=e44]:
+            - link "Lihat Katalog" [ref=e45] [cursor=pointer]:
+              - /url: /catalog
+            - link "Kunjungi Shopee" [ref=e46] [cursor=pointer]:
+              - /url: https://shopee.co.id/alphastore1
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]: 2k+
+              - generic [ref=e50]: Products
+            - generic [ref=e51]:
+              - generic [ref=e52]: 10k+
+              - generic [ref=e53]: Customers
+            - generic [ref=e54]:
+              - generic [ref=e55]: 15y
+              - generic [ref=e56]: Experience
+      - generic [ref=e58]:
+        - text: Browse Collections
+        - heading "Kategori Produk" [level=2] [ref=e59]
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - text: Top Picks
+          - heading "Produk Unggulan" [level=2] [ref=e64]
+          - paragraph [ref=e65]: Professional grade equipment tested for performance and durability in Palembang waters.
+        - link "Explore Catalog" [ref=e66] [cursor=pointer]:
+          - /url: /catalog
+          - text: Explore Catalog
+          - img [ref=e67]
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - text: Best Sellers
+            - heading "Paling Laris" [level=2] [ref=e73]
+            - paragraph [ref=e74]: Produk paling populer yang menjadi favorit pelanggan
+          - link "Lihat Semua" [ref=e75] [cursor=pointer]:
+            - /url: /catalog?sort=bestseller
+            - text: Lihat Semua
+            - img [ref=e76]
+        - generic [ref=e78]: Belum ada data penjualan
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - img [ref=e84]
+          - heading "Barang Asli" [level=3] [ref=e86]
+          - paragraph [ref=e87]: Semua produk bersertifikat asli dari brand resmi.
+        - generic [ref=e88]:
+          - img [ref=e90]
+          - heading "Pengiriman Cepat" [level=3] [ref=e92]
+          - paragraph [ref=e93]: Proses pesanan di hari yang sama untuk area Palembang.
+        - generic [ref=e94]:
+          - img [ref=e96]
+          - heading "Konsultasi Gratis" [level=3] [ref=e98]
+          - paragraph [ref=e99]: Hubungi kami untuk rekomendasi alat pancing yang tepat.
+      - generic [ref=e102]:
+        - generic [ref=e106]:
+          - img "Shop Interior" [ref=e107]
+          - generic [ref=e109]:
+            - generic [ref=e110]: 25+
+            - generic [ref=e111]: Years of Excellence
+        - generic [ref=e112]:
+          - generic [ref=e113]: Dedicated Partner
+          - heading "Mitra Terpercaya Sejak 1998" [level=2] [ref=e114]
+          - generic [ref=e115]:
+            - paragraph [ref=e116]: Berdiri di jantung kota Palembang, Dunia Pancing telah menjadi standar bagi komunitas pemancing. Kami memahami bahwa setiap tarikan memerlukan alat yang presisi.
+            - paragraph [ref=e117]: Kami bangga menjadi dealer resmi brand internasional, menjamin keaslian dan layanan purna jual yang tidak bisa Anda temukan di tempat lain.
+          - generic [ref=e118]:
+            - link "Shop Now" [ref=e119] [cursor=pointer]:
+              - /url: /catalog
+            - link "Kontak" [ref=e120] [cursor=pointer]:
+              - /url: /contact
+  - contentinfo [ref=e121]:
+    - generic [ref=e122]:
+      - generic [ref=e123]:
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - img [ref=e127]
+            - generic [ref=e129]:
+              - generic [ref=e130]: DUNIA PANCING
+              - generic [ref=e131]: Palembang
+          - paragraph [ref=e132]: Mitra terpercaya pemancing di Palembang sejak 1998. Kami menghadirkan kualitas tingkat dunia untuk hobi memancing Anda.
+          - generic [ref=e133]:
+            - link "facebook" [ref=e134] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e135]: facebook
+            - link "instagram" [ref=e137] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e138]: instagram
+            - link "youtube" [ref=e140] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e141]: youtube
+        - generic [ref=e143]:
+          - heading "Navigation" [level=4] [ref=e144]
+          - list [ref=e145]:
+            - listitem [ref=e146]:
+              - link "Home" [ref=e147] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e148]:
+              - link "Digital Catalog" [ref=e149] [cursor=pointer]:
+                - /url: /catalog
+            - listitem [ref=e150]:
+              - link "Blog" [ref=e151] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e152]:
+              - link "Visit Store" [ref=e153] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e154]:
+          - heading "Legal" [level=4] [ref=e155]
+          - list [ref=e156]:
+            - listitem [ref=e157]:
+              - link "Terms of Service" [ref=e158] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e159]:
+              - link "Privacy Policy" [ref=e160] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e161]:
+              - link "Warranty Info" [ref=e162] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e163]:
+          - heading "Newsletter" [level=4] [ref=e164]
+          - paragraph [ref=e165]: Get stock updates and pro tips.
+          - generic [ref=e166]:
+            - textbox "Email address" [ref=e167]
+            - button [ref=e168]:
+              - img [ref=e169]
+      - generic [ref=e171]:
+        - paragraph [ref=e172]: © 2024 DUNIA PANCING PALEMBANG. ALL RIGHTS RESERVED.
+        - generic [ref=e174]: Secure Payments via Shopee
+  - button "Buka Chat" [ref=e175]:
+    - img [ref=e176]
+    - generic [ref=e178]: Chat

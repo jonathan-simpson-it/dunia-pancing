@@ -1,0 +1,432 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e5]:
+        - link "DUNIA PANCING Palembang • Indonesia" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]:
+            - generic [ref=e12]: DUNIA PANCING
+            - generic [ref=e13]: Palembang • Indonesia
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - link "Beranda" [ref=e16] [cursor=pointer]:
+              - /url: /
+            - link "Katalog" [ref=e17] [cursor=pointer]:
+              - /url: /catalog
+            - link "Blog" [ref=e18] [cursor=pointer]:
+              - /url: /blog
+            - link "Kontak" [ref=e19] [cursor=pointer]:
+              - /url: /contact
+            - link "Dashboard" [ref=e97] [cursor=pointer]:
+              - /url: /admin
+          - link [ref=e98] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e99]
+          - link "Admin" [ref=e101] [cursor=pointer]:
+            - /url: /admin
+          - link [ref=e21] [cursor=pointer]:
+            - /url: /cart
+            - img [ref=e22]
+          - button "ID EN" [ref=e25]:
+            - generic [ref=e26]: ID
+            - generic [ref=e28]: EN
+    - main [ref=e29]:
+      - generic [ref=e30]:
+        - navigation [ref=e102]:
+          - link "Home" [ref=e103] [cursor=pointer]:
+            - /url: /
+          - img [ref=e104]
+          - link "Katalog" [ref=e106] [cursor=pointer]:
+            - /url: /catalog
+          - img [ref=e107]
+          - link "Senar" [ref=e109] [cursor=pointer]:
+            - /url: /catalog?category=lines
+          - img [ref=e110]
+          - generic [ref=e112]: Senar Test Variant
+        - generic [ref=e113]:
+          - generic [ref=e114]:
+            - generic [ref=e116]:
+              - img "Senar Test Variant" [ref=e117]
+              - generic [ref=e118]: "-23%"
+            - generic [ref=e119]:
+              - generic [ref=e120]:
+                - generic [ref=e121]: TestBrand
+                - link "Senar" [ref=e122] [cursor=pointer]:
+                  - /url: /catalog?category=lines
+              - heading "Senar Test Variant" [level=1] [ref=e123]
+              - generic [ref=e124]: "0"
+              - generic [ref=e126]:
+                - generic [ref=e127]: Rp 50.000
+                - generic [ref=e128]: Rp 65.000
+                - generic [ref=e129]: "-23%"
+              - generic [ref=e130]:
+                - generic [ref=e131]: Stok:100 tersedia
+                - generic [ref=e132]: "Berat: 50g"
+              - generic [ref=e133]:
+                - paragraph [ref=e134]: Pilih varian untuk melanjutkan
+                - generic [ref=e135]:
+                  - generic [ref=e136]:
+                    - generic [ref=e137]: "Warna:"
+                    - generic [ref=e138]:
+                      - button "Merah" [ref=e139]
+                      - button "Biru" [ref=e140]
+                  - generic [ref=e141]:
+                    - generic [ref=e142]: "Ukuran:"
+                    - generic [ref=e143]:
+                      - button "Kecil" [ref=e144]
+                      - button "Besar" [ref=e145]
+                - button "Tabel Ukuran →" [ref=e146]
+              - generic [ref=e148]:
+                - generic [ref=e149]:
+                  - generic [ref=e150]: 📋
+                  - text: Garansi 30 Hari
+                - generic [ref=e151]:
+                  - generic [ref=e152]: ✅
+                  - text: Produk Original
+              - generic [ref=e153]:
+                - img [ref=e154]
+                - text: Estimasi tiba 3 - 7 hari
+                - generic [ref=e156]: Bebas Pengembalian
+                - generic [ref=e157]: "|"
+                - generic [ref=e158]: Proteksi Kerusakan+
+              - generic [ref=e160]:
+                - generic [ref=e161]: Jumlah
+                - generic [ref=e162]:
+                  - button "−" [disabled] [ref=e163]
+                  - generic [ref=e164]: "1"
+                  - button "+" [ref=e165]
+              - generic [ref=e166]:
+                - button "+ Keranjang" [disabled] [ref=e167]:
+                  - img [ref=e168]
+                  - text: + Keranjang
+                - button "Beli Langsung" [disabled] [ref=e170]
+              - generic [ref=e171]:
+                - generic [ref=e172]:
+                  - generic [ref=e173]: "Bagikan:"
+                  - button [ref=e174]:
+                    - img [ref=e175]
+                - generic [ref=e177]:
+                  - button [ref=e178]:
+                    - img [ref=e179]
+                  - generic [ref=e181] [cursor=pointer]:
+                    - img [ref=e182]
+                    - text: Laporkan
+              - generic [ref=e184]:
+                - heading "Keunggulan Produk" [level=4] [ref=e185]
+                - generic [ref=e186]:
+                  - generic [ref=e187]:
+                    - img [ref=e188]
+                    - text: Produk Original 100%
+                  - generic [ref=e190]:
+                    - img [ref=e191]
+                    - text: Garansi 30 Hari
+          - generic [ref=e193]:
+            - generic [ref=e194]:
+              - heading "Spesifikasi" [level=2] [ref=e195]
+              - table [ref=e197]:
+                - rowgroup [ref=e198]:
+                  - row "Test Spec 1 ✓" [ref=e199]:
+                    - cell "Test Spec 1" [ref=e200]
+                    - cell "✓" [ref=e201]
+                  - row "Test Spec 2 ✓" [ref=e202]:
+                    - cell "Test Spec 2" [ref=e203]
+                    - cell "✓" [ref=e204]
+            - generic [ref=e205]:
+              - heading "Deskripsi" [level=2] [ref=e206]
+              - generic [ref=e207]: Test produk dengan varian warna dan ukuran
+            - generic [ref=e208]:
+              - heading "Ulasan0" [level=2] [ref=e209]
+              - generic [ref=e210]:
+                - text: "0"
+                - paragraph [ref=e211]: Belum ada ulasan tertulis
+          - generic [ref=e212]:
+            - heading "Produk Terkait" [level=2] [ref=e213]
+            - generic [ref=e214]:
+              - generic [ref=e215]:
+                - generic [ref=e216]:
+                  - link "Senar PE Sougayilang 17m Senar PE Sougayilang 17m Senar PE Sougayilang 17m" [ref=e217] [cursor=pointer]:
+                    - /url: /product/dp-017
+                    - img "Senar PE Sougayilang 17m" [ref=e218]
+                    - img "Senar PE Sougayilang 17m" [ref=e219]
+                    - img "Senar PE Sougayilang 17m" [ref=e220]
+                  - generic [ref=e221]: "-13%"
+                  - button [ref=e222]:
+                    - img [ref=e223]
+                  - button [ref=e225]:
+                    - img [ref=e226]
+                  - generic [ref=e228]:
+                    - button [ref=e229]
+                    - button [ref=e230]
+                    - button [ref=e231]
+                - generic [ref=e232]:
+                  - link "Senar PE Sougayilang 17m" [ref=e233] [cursor=pointer]:
+                    - /url: /product/dp-017
+                    - heading "Senar PE Sougayilang 17m" [level=3] [ref=e234]
+                  - generic [ref=e235]:
+                    - generic [ref=e236]: Rp 102.903
+                    - text: Rp 89.526
+                  - generic [ref=e237]:
+                    - generic [ref=e238]:
+                      - generic [ref=e239]:
+                        - generic [ref=e240]: ★
+                        - generic [ref=e241]: ★
+                        - generic [ref=e242]: ★
+                        - generic [ref=e243]: ★
+                        - generic [ref=e244]: ★
+                      - generic [ref=e245]: "4.1"
+                    - generic [ref=e246]: Terjual 194
+                  - link "Beli Langsung" [ref=e247] [cursor=pointer]:
+                    - /url: /product/dp-017
+                    - img [ref=e248]
+                    - text: Beli Langsung
+              - generic [ref=e251]:
+                - generic [ref=e252]:
+                  - link "Senar Monofilament Armilo 40m Senar Monofilament Armilo 40m Senar Monofilament Armilo 40m" [ref=e253] [cursor=pointer]:
+                    - /url: /product/dp-018
+                    - img "Senar Monofilament Armilo 40m" [ref=e254]
+                    - img "Senar Monofilament Armilo 40m" [ref=e255]
+                    - img "Senar Monofilament Armilo 40m" [ref=e256]
+                  - generic [ref=e257]: "-13%"
+                  - generic [ref=e259]: Stok Habis
+                  - button [ref=e260]:
+                    - img [ref=e261]
+                  - button [ref=e263]:
+                    - img [ref=e264]
+                  - generic [ref=e266]:
+                    - button [ref=e267]
+                    - button [ref=e268]
+                    - button [ref=e269]
+                - generic [ref=e270]:
+                  - link "Senar Monofilament Armilo 40m" [ref=e271] [cursor=pointer]:
+                    - /url: /product/dp-018
+                    - heading "Senar Monofilament Armilo 40m" [level=3] [ref=e272]
+                  - generic [ref=e273]:
+                    - generic [ref=e274]: Rp 310.240
+                    - text: Rp 269.909
+                  - generic [ref=e275]:
+                    - generic [ref=e276]:
+                      - generic [ref=e277]:
+                        - generic [ref=e278]: ★
+                        - generic [ref=e279]: ★
+                        - generic [ref=e280]: ★
+                        - generic [ref=e281]: ★
+                        - generic [ref=e282]: ★
+                      - generic [ref=e283]: "5"
+                    - generic [ref=e284]: Terjual 1.6rb
+                  - link "Beli Langsung" [ref=e285] [cursor=pointer]:
+                    - /url: /product/dp-018
+                    - img [ref=e286]
+                    - text: Beli Langsung
+              - generic [ref=e289]:
+                - generic [ref=e290]:
+                  - link "Senar Fluorocarbon Seaguar 23m Senar Fluorocarbon Seaguar 23m Senar Fluorocarbon Seaguar 23m" [ref=e291] [cursor=pointer]:
+                    - /url: /product/dp-019
+                    - img "Senar Fluorocarbon Seaguar 23m" [ref=e292]
+                    - img "Senar Fluorocarbon Seaguar 23m" [ref=e293]
+                    - img "Senar Fluorocarbon Seaguar 23m" [ref=e294]
+                  - generic [ref=e295]: "-11%"
+                  - button [ref=e296]:
+                    - img [ref=e297]
+                  - button [ref=e299]:
+                    - img [ref=e300]
+                  - generic [ref=e302]:
+                    - button [ref=e303]
+                    - button [ref=e304]
+                    - button [ref=e305]
+                - generic [ref=e306]:
+                  - link "Senar Fluorocarbon Seaguar 23m" [ref=e307] [cursor=pointer]:
+                    - /url: /product/dp-019
+                    - heading "Senar Fluorocarbon Seaguar 23m" [level=3] [ref=e308]
+                  - generic [ref=e309]:
+                    - generic [ref=e310]: Rp 510.777
+                    - text: Rp 454.592
+                  - generic [ref=e311]:
+                    - generic [ref=e312]:
+                      - generic [ref=e313]:
+                        - generic [ref=e314]: ★
+                        - generic [ref=e315]: ★
+                        - generic [ref=e316]: ★
+                        - generic [ref=e317]: ★
+                        - generic [ref=e318]: ★
+                      - generic [ref=e319]: "3.6"
+                    - generic [ref=e320]: Terjual 969
+                  - link "Beli Langsung" [ref=e321] [cursor=pointer]:
+                    - /url: /product/dp-019
+                    - img [ref=e322]
+                    - text: Beli Langsung
+              - generic [ref=e325]:
+                - generic [ref=e326]:
+                  - link "Senar Braided Berkley 50m Senar Braided Berkley 50m Senar Braided Berkley 50m" [ref=e327] [cursor=pointer]:
+                    - /url: /product/dp-020
+                    - img "Senar Braided Berkley 50m" [ref=e328]
+                    - img "Senar Braided Berkley 50m" [ref=e329]
+                    - img "Senar Braided Berkley 50m" [ref=e330]
+                  - generic [ref=e331]: "-25%"
+                  - button [ref=e332]:
+                    - img [ref=e333]
+                  - button [ref=e335]:
+                    - img [ref=e336]
+                  - generic [ref=e338]:
+                    - button [ref=e339]
+                    - button [ref=e340]
+                    - button [ref=e341]
+                - generic [ref=e342]:
+                  - link "Senar Braided Berkley 50m" [ref=e343] [cursor=pointer]:
+                    - /url: /product/dp-020
+                    - heading "Senar Braided Berkley 50m" [level=3] [ref=e344]
+                  - generic [ref=e345]:
+                    - generic [ref=e346]: Rp 563.679
+                    - text: Rp 422.759
+                  - generic [ref=e347]:
+                    - generic [ref=e348]:
+                      - generic [ref=e349]:
+                        - generic [ref=e350]: ★
+                        - generic [ref=e351]: ★
+                        - generic [ref=e352]: ★
+                        - generic [ref=e353]: ★
+                        - generic [ref=e354]: ★
+                      - generic [ref=e355]: "4.4"
+                    - generic [ref=e356]: Terjual 294
+                  - link "Beli Langsung" [ref=e357] [cursor=pointer]:
+                    - /url: /product/dp-020
+                    - img [ref=e358]
+                    - text: Beli Langsung
+              - generic [ref=e361]:
+                - generic [ref=e362]:
+                  - link "Senar Pancing PowerPro 65m Senar Pancing PowerPro 65m Senar Pancing PowerPro 65m" [ref=e363] [cursor=pointer]:
+                    - /url: /product/dp-021
+                    - img "Senar Pancing PowerPro 65m" [ref=e364]
+                    - img "Senar Pancing PowerPro 65m" [ref=e365]
+                    - img "Senar Pancing PowerPro 65m" [ref=e366]
+                  - generic [ref=e367]: "-27%"
+                  - button [ref=e368]:
+                    - img [ref=e369]
+                  - button [ref=e371]:
+                    - img [ref=e372]
+                  - generic [ref=e374]:
+                    - button [ref=e375]
+                    - button [ref=e376]
+                    - button [ref=e377]
+                - generic [ref=e378]:
+                  - link "Senar Pancing PowerPro 65m" [ref=e379] [cursor=pointer]:
+                    - /url: /product/dp-021
+                    - heading "Senar Pancing PowerPro 65m" [level=3] [ref=e380]
+                  - generic [ref=e381]:
+                    - generic [ref=e382]: Rp 881.611
+                    - text: Rp 643.576
+                  - generic [ref=e383]:
+                    - generic [ref=e384]:
+                      - generic [ref=e385]:
+                        - generic [ref=e386]: ★
+                        - generic [ref=e387]: ★
+                        - generic [ref=e388]: ★
+                        - generic [ref=e389]: ★
+                        - generic [ref=e390]: ★
+                      - generic [ref=e391]: "4.9"
+                    - generic [ref=e392]: Terjual 1.2rb
+                  - link "Beli Langsung" [ref=e393] [cursor=pointer]:
+                    - /url: /product/dp-021
+                    - img [ref=e394]
+                    - text: Beli Langsung
+              - generic [ref=e397]:
+                - generic [ref=e398]:
+                  - link "Leader Sunline 10m Leader Sunline 10m Leader Sunline 10m" [ref=e399] [cursor=pointer]:
+                    - /url: /product/dp-022
+                    - img "Leader Sunline 10m" [ref=e400]
+                    - img "Leader Sunline 10m" [ref=e401]
+                    - img "Leader Sunline 10m" [ref=e402]
+                  - generic [ref=e403]: "-33%"
+                  - button [ref=e404]:
+                    - img [ref=e405]
+                  - button [ref=e407]:
+                    - img [ref=e408]
+                  - generic [ref=e410]:
+                    - button [ref=e411]
+                    - button [ref=e412]
+                    - button [ref=e413]
+                - generic [ref=e414]:
+                  - link "Leader Sunline 10m" [ref=e415] [cursor=pointer]:
+                    - /url: /product/dp-022
+                    - heading "Leader Sunline 10m" [level=3] [ref=e416]
+                  - generic [ref=e417]:
+                    - generic [ref=e418]: Rp 670.622
+                    - text: Rp 449.317
+                  - generic [ref=e419]:
+                    - generic [ref=e420]:
+                      - generic [ref=e421]:
+                        - generic [ref=e422]: ★
+                        - generic [ref=e423]: ★
+                        - generic [ref=e424]: ★
+                        - generic [ref=e425]: ★
+                        - generic [ref=e426]: ★
+                      - generic [ref=e427]: "4.7"
+                    - generic [ref=e428]: Terjual 594
+                  - link "Beli Langsung" [ref=e429] [cursor=pointer]:
+                    - /url: /product/dp-022
+                    - img [ref=e430]
+                    - text: Beli Langsung
+    - contentinfo [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - img [ref=e45]
+              - generic [ref=e47]:
+                - generic [ref=e48]: DUNIA PANCING
+                - generic [ref=e49]: Palembang
+            - paragraph [ref=e50]: Mitra terpercaya pemancing di Palembang sejak 1998. Kami menghadirkan kualitas tingkat dunia untuk hobi memancing Anda.
+            - generic [ref=e51]:
+              - link "facebook" [ref=e52] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e53]: facebook
+              - link "instagram" [ref=e55] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e56]: instagram
+              - link "youtube" [ref=e58] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e59]: youtube
+          - generic [ref=e61]:
+            - heading "Navigation" [level=4] [ref=e62]
+            - list [ref=e63]:
+              - listitem [ref=e64]:
+                - link "Home" [ref=e65] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e66]:
+                - link "Digital Catalog" [ref=e67] [cursor=pointer]:
+                  - /url: /catalog
+              - listitem [ref=e68]:
+                - link "Blog" [ref=e69] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e70]:
+                - link "Visit Store" [ref=e71] [cursor=pointer]:
+                  - /url: /contact
+          - generic [ref=e72]:
+            - heading "Legal" [level=4] [ref=e73]
+            - list [ref=e74]:
+              - listitem [ref=e75]:
+                - link "Terms of Service" [ref=e76] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e77]:
+                - link "Privacy Policy" [ref=e78] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e79]:
+                - link "Warranty Info" [ref=e80] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e81]:
+            - heading "Newsletter" [level=4] [ref=e82]
+            - paragraph [ref=e83]: Get stock updates and pro tips.
+            - generic [ref=e84]:
+              - textbox "Email address" [ref=e85]
+              - button [ref=e86]:
+                - img [ref=e87]
+        - generic [ref=e89]:
+          - paragraph [ref=e90]: © 2024 DUNIA PANCING PALEMBANG. ALL RIGHTS RESERVED.
+          - generic [ref=e92]: Secure Payments via Shopee
+    - button "Buka Chat" [ref=e93]:
+      - img [ref=e94]
+      - generic [ref=e96]: Chat
+      - generic [ref=e433]: "1"
+  - button "Open Next.js Dev Tools" [ref=e439] [cursor=pointer]:
+    - img [ref=e440]
+  - alert [ref=e443]

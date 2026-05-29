@@ -7,7 +7,9 @@ import { useProducts } from '../context/ProductStore'
 import { useAuth } from '../context/AuthContext'
 import { formatIDR } from '../utils/formatters'
 import ImageUploader from '../components/ui/ImageUploader'
-import type { Product } from '../types'
+import VariantBuilder from '../components/ui/VariantBuilder'
+import FeatureEditor from '../components/ui/FeatureEditor'
+import type { Product, VariantType, ProductVariant, ProductFeature } from '../types'
 import id from '../locales/id.json'
 import en from '../locales/en.json'
 
@@ -22,6 +24,8 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Record<string, any>>({})
+  const [showVariantEditor, setShowVariantEditor] = useState<string | null>(null)
+  const [showFeatureEditor, setShowFeatureEditor] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('products')
 
@@ -63,6 +67,8 @@ export default function AdminDashboard() {
       brand: product.brand,
       category: product.category,
       images: product.images || [product.image].filter(Boolean),
+      shippingEstimateMin: product.shippingEstimateDays?.min || 3,
+      shippingEstimateMax: product.shippingEstimateDays?.max || 7,
     })
   }
 
@@ -75,6 +81,10 @@ export default function AdminDashboard() {
       stock_qty: Number(editForm.stock_qty),
       images,
       image: images[0] || '',
+      shippingEstimateDays: {
+        min: Number(editForm.shippingEstimateMin) || 3,
+        max: Number(editForm.shippingEstimateMax) || 7,
+      },
     })
     setEditingId(null)
   }
@@ -165,81 +175,135 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filtered.map(p => (
-                        <tr key={p.id} className="border-t border-slate-50 hover:bg-slate-50/50 transition-colors">
-                          {editingId === p.id ? (
-                            <>
-                              <td className="px-4 py-3 font-mono text-[11px] text-slate-400">{p.id}</td>
-                              <td className="px-4 py-3">
-                                <input value={editForm.name_id || ''} onChange={e => setEditForm({...editForm, name_id: e.target.value})} className="w-full px-2 py-1 border border-slate-200 rounded text-[11px]" />
-                                <input value={editForm.name_en || ''} onChange={e => setEditForm({...editForm, name_en: e.target.value})} className="w-full px-2 py-1 border border-slate-200 rounded text-[11px] mt-1" />
-                                {editForm.images && editForm.images.length > 0 && (
-                                  <div className="mt-2 flex items-center gap-1">
-                                    {editForm.images.map((url: string, i: number) => (
-                                      <img key={i} src={url} alt="" className="w-8 h-8 rounded object-cover bg-slate-50 border border-slate-200" />
-                                    ))}
-                                    <span className="text-[9px] text-slate-400 ml-1">{editForm.images.length} {lang === 'id' ? 'gambar' : 'images'}</span>
-                                  </div>
-                                )}
-                              </td>
-                              <td className="px-4 py-3 hidden sm:table-cell">
-                                <select value={editForm.category || ''} onChange={e => setEditForm({...editForm, category: e.target.value})} className="px-2 py-1 border border-slate-200 rounded text-[11px]">
-                                  {categories.map(c => <option key={c.key} value={c.key}>{c.name_id}</option>)}
-                                </select>
-                                <input value={editForm.brand || ''} onChange={e => setEditForm({...editForm, brand: e.target.value})} className="w-full px-2 py-1 border border-slate-200 rounded text-[11px] mt-1" placeholder="Brand" />
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <input value={editForm.price_idr || ''} onChange={e => setEditForm({...editForm, price_idr: e.target.value})} className="w-24 px-2 py-1 border border-slate-200 rounded text-[11px] text-right" />
-                              </td>
-                              <td className="px-4 py-3 text-center hidden sm:table-cell">
-                                <input value={editForm.stock_qty || ''} onChange={e => setEditForm({...editForm, stock_qty: e.target.value})} className="w-16 px-2 py-1 border border-slate-200 rounded text-[11px] text-center" />
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <button onClick={() => saveEdit(p.id)} className="text-emerald-600 font-bold text-[11px] hover:text-emerald-700 mr-3">{lang === 'id' ? 'Simpan' : 'Save'}</button>
-                                <button onClick={() => setEditingId(null)} className="text-slate-400 font-bold text-[11px] hover:text-slate-600">{lang === 'id' ? 'Batal' : 'Cancel'}</button>
-                              </td>
-                            </>
-                          ) : (
-                            <>
-                              <td className="px-4 py-3 font-mono text-[11px] text-slate-400">{p.id}</td>
-                              <td className="px-4 py-3">
-                                <div className="font-semibold text-slate-900 truncate max-w-[200px]">{p.name_id}</div>
-                                <div className="text-[10px] text-slate-400 truncate">{p.brand}</div>
-                              </td>
-                              <td className="px-4 py-3 hidden sm:table-cell">
-                                <span className="text-[10px] font-semibold text-sky-600 bg-sky-50 px-2 py-0.5 rounded capitalize">{p.category}</span>
-                              </td>
-                              <td className="px-4 py-3 text-right font-bold text-slate-900">
-                                {formatIDR(p.price_idr)}
-                                {p.original_price_idr > p.price_idr && (
-                                  <div className="text-[10px] text-slate-400 line-through font-normal">{formatIDR(p.original_price_idr)}</div>
-                                )}
-                              </td>
-                              <td className="px-4 py-3 text-center hidden sm:table-cell">
-                                <span className={`text-[11px] font-semibold ${p.stock_qty > 0 ? 'text-emerald-600' : 'text-red-500'}`}>{p.stock_qty || 0}</span>
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <button onClick={() => startEdit(p)} className="text-brand-primary font-bold text-[11px] hover:text-sky-700 mr-3">Edit</button>
-                                {confirmDelete === p.id ? (
-                                  <>
-                                    <button onClick={() => handleDelete(p.id)} className="text-red-500 font-bold text-[11px] hover:text-red-700 mr-2">{lang === 'id' ? 'Hapus' : 'Delete'}</button>
-                                    <button onClick={() => setConfirmDelete(null)} className="text-slate-400 font-bold text-[11px]">{lang === 'id' ? 'Batal' : 'No'}</button>
-                                  </>
-                                ) : (
-                                  <button onClick={() => setConfirmDelete(p.id)} className="text-slate-400 font-bold text-[11px] hover:text-red-500">{lang === 'id' ? 'Hapus' : 'Delete'}</button>
-                                )}
-                              </td>
-                            </>
-                          )}
-                        </tr>
-                      ))}
-                      {filtered.length === 0 && (
+                      {filtered.length === 0 ? (
                         <tr>
                           <td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-[13px]">
                             {lang === 'id' ? 'Tidak ada produk' : 'No products found'}
                           </td>
                         </tr>
-                      )}
+                      ) : filtered.flatMap(p => {
+                        const rows: React.ReactNode[] = []
+                        rows.push(
+                          <tr key={p.id} className="border-t border-slate-50 hover:bg-slate-50/50 transition-colors">
+                            {editingId === p.id ? (
+                              <>
+                                <td className="px-4 py-3 font-mono text-[11px] text-slate-400">{p.id}</td>
+                                <td className="px-4 py-3">
+                                  <input value={editForm.name_id || ''} onChange={e => setEditForm({...editForm, name_id: e.target.value})} className="w-full px-2 py-1 border border-slate-200 rounded text-[11px]" />
+                                  <input value={editForm.name_en || ''} onChange={e => setEditForm({...editForm, name_en: e.target.value})} className="w-full px-2 py-1 border border-slate-200 rounded text-[11px] mt-1" />
+                                  {editForm.images && editForm.images.length > 0 && (
+                                    <div className="mt-2 flex items-center gap-1">
+                                      {editForm.images.map((url: string, i: number) => (
+                                        <img key={i} src={url} alt="" className="w-8 h-8 rounded object-cover bg-slate-50 border border-slate-200" />
+                                      ))}
+                                      <span className="text-[9px] text-slate-400 ml-1">{editForm.images.length} {lang === 'id' ? 'gambar' : 'images'}</span>
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="px-4 py-3 hidden sm:table-cell">
+                                  <select value={editForm.category || ''} onChange={e => setEditForm({...editForm, category: e.target.value})} className="px-2 py-1 border border-slate-200 rounded text-[11px]">
+                                    {categories.map(c => <option key={c.key} value={c.key}>{c.name_id}</option>)}
+                                  </select>
+                                  <input value={editForm.brand || ''} onChange={e => setEditForm({...editForm, brand: e.target.value})} className="w-full px-2 py-1 border border-slate-200 rounded text-[11px] mt-1" placeholder="Brand" />
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <input value={editForm.price_idr || ''} onChange={e => setEditForm({...editForm, price_idr: e.target.value})} className="w-24 px-2 py-1 border border-slate-200 rounded text-[11px] text-right" />
+                                </td>
+                                <td className="px-4 py-3 text-center hidden sm:table-cell">
+                                  <input value={editForm.stock_qty || ''} onChange={e => setEditForm({...editForm, stock_qty: e.target.value})} className="w-16 px-2 py-1 border border-slate-200 rounded text-[11px] text-center" />
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <button onClick={() => saveEdit(p.id)} className="text-emerald-600 font-bold text-[11px] hover:text-emerald-700 mr-3">{lang === 'id' ? 'Simpan' : 'Save'}</button>
+                                  <button onClick={() => setEditingId(null)} className="text-slate-400 font-bold text-[11px] hover:text-slate-600">{lang === 'id' ? 'Batal' : 'Cancel'}</button>
+                                </td>
+                              </>
+                            ) : (
+                              <>
+                                <td className="px-4 py-3 font-mono text-[11px] text-slate-400">{p.id}</td>
+                                <td className="px-4 py-3">
+                                  <div className="font-semibold text-slate-900 truncate max-w-[200px]">{p.name_id}</div>
+                                  <div className="text-[10px] text-slate-400 truncate">{p.brand}</div>
+                                </td>
+                                <td className="px-4 py-3 hidden sm:table-cell">
+                                  <span className="text-[10px] font-semibold text-sky-600 bg-sky-50 px-2 py-0.5 rounded capitalize">{p.category}</span>
+                                </td>
+                                <td className="px-4 py-3 text-right font-bold text-slate-900">
+                                  {formatIDR(p.price_idr)}
+                                  {p.original_price_idr > p.price_idr && (
+                                    <div className="text-[10px] text-slate-400 line-through font-normal">{formatIDR(p.original_price_idr)}</div>
+                                  )}
+                                </td>
+                                <td className="px-4 py-3 text-center hidden sm:table-cell">
+                                  <span className={`text-[11px] font-semibold ${p.stock_qty > 0 ? 'text-emerald-600' : 'text-red-500'}`}>{p.stock_qty || 0}</span>
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <button onClick={() => startEdit(p)} className="text-brand-primary font-bold text-[11px] hover:text-sky-700 mr-2">Edit</button>
+                                  <button onClick={() => setShowVariantEditor(showVariantEditor === p.id ? null : p.id)} className="text-sky-600 font-bold text-[11px] hover:text-sky-800 mr-2">
+                                    {lang === 'id' ? 'Varian' : 'Variants'}
+                                  </button>
+                                  <button onClick={() => setShowFeatureEditor(showFeatureEditor === p.id ? null : p.id)} className="text-emerald-600 font-bold text-[11px] hover:text-emerald-800 mr-2">
+                                    {lang === 'id' ? 'Fitur' : 'Features'}
+                                  </button>
+                                  {confirmDelete === p.id ? (
+                                    <>
+                                      <button onClick={() => handleDelete(p.id)} className="text-red-500 font-bold text-[11px] hover:text-red-700 mr-2">{lang === 'id' ? 'Hapus' : 'Delete'}</button>
+                                      <button onClick={() => setConfirmDelete(null)} className="text-slate-400 font-bold text-[11px]">{lang === 'id' ? 'Batal' : 'No'}</button>
+                                    </>
+                                  ) : (
+                                    <button onClick={() => setConfirmDelete(p.id)} className="text-slate-400 font-bold text-[11px] hover:text-red-500">{lang === 'id' ? 'Hapus' : 'Delete'}</button>
+                                  )}
+                                </td>
+                              </>
+                            )}
+                          </tr>
+                        )
+                        if (showVariantEditor === p.id) {
+                          rows.push(
+                            <tr key={p.id + '-variants'}>
+                              <td colSpan={6} className="px-4 py-4 bg-sky-50/30 border-t border-sky-100">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[12px] font-bold text-sky-700">
+                                    {lang === 'id' ? 'Varian:' : 'Variants:'} {p.name_id}
+                                  </span>
+                                  <button type="button" onClick={() => setShowVariantEditor(null)} className="text-[10px] text-slate-400 hover:text-slate-600">
+                                    {lang === 'id' ? 'Tutup' : 'Close'}
+                                  </button>
+                                </div>
+                                <VariantBuilder
+                                  variantTypes={p.variantTypes || []}
+                                  variants={p.variants || []}
+                                  onChange={(newTypes, newVariants) => {
+                                    updateProduct(p.id, { variantTypes: newTypes, variants: newVariants })
+                                  }}
+                                />
+                              </td>
+                            </tr>
+                          )
+                        }
+                        if (showFeatureEditor === p.id) {
+                          rows.push(
+                            <tr key={p.id + '-features'}>
+                              <td colSpan={6} className="px-4 py-4 bg-emerald-50/30 border-t border-emerald-100">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[12px] font-bold text-emerald-700">
+                                    {lang === 'id' ? 'Fitur:' : 'Features:'} {p.name_id}
+                                  </span>
+                                  <button type="button" onClick={() => setShowFeatureEditor(null)} className="text-[10px] text-slate-400 hover:text-slate-600">
+                                    {lang === 'id' ? 'Tutup' : 'Close'}
+                                  </button>
+                                </div>
+                                <FeatureEditor
+                                  features={p.features || []}
+                                  onChange={(newFeatures) => {
+                                    updateProduct(p.id, { features: newFeatures })
+                                  }}
+                                />
+                              </td>
+                            </tr>
+                          )
+                        }
+                        return rows
+                      })}
                     </tbody>
                   </table>
                 </div>
