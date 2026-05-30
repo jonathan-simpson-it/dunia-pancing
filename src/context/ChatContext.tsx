@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import type { ChatMessage, ChatSender } from '../types'
 
@@ -12,122 +14,70 @@ interface ChatContextValue {
 }
 
 const ChatContext = createContext<ChatContextValue>(null!)
-const STORAGE_KEY = 'dunia-pancing-chat'
-const ADMIN_DELAY = 1500
+const SESSION_KEY = 'dunia-pancing-chat-session'
 
-interface AutoReplyEntry {
-  keywords: string[]
-  reply: string
-}
-
-const AUTO_REPLIES: Record<string, AutoReplyEntry[]> = {
-  id: [
-    { keywords: ['stok', 'tersedia', 'barang', 'ready'], reply: 'Untuk informasi stok terkini, silakan cek langsung di halaman produk. Jika ada produk tertentu yang ingin ditanyakan, sebutkan nama produknya ya!' },
-    { keywords: ['harga', 'mahal', 'murah', 'diskon', 'promo'], reply: 'Harga produk sudah tercantum di katalog kami. Kami juga memiliki diskon khusus untuk pembelian grosir. Hubungi admin untuk info lebih lanjut.' },
-    { keywords: ['kirim', 'ongkir', 'pengiriman', 'sampai', 'lama', 'cod'], reply: 'Kami melayani pengiriman ke seluruh Indonesia via JNE, J&T, dan SiCepat. Bisa juga COD untuk area Palembang. Estimasi 2-5 hari kerja.' },
-    { keywords: ['bayar', 'transfer', 'pembayaran', 'payment', 'bca', 'bri'], reply: 'Pembayaran bisa melalui transfer Bank BCA, BRI, Mandiri, atau COD. Untuk transfer, silakan lakukan ke rekening yang tertera di halaman checkout.' },
-    { keywords: ['garansi', 'retur', 'tukar', 'kembali', 'rusak'], reply: 'Setiap produk kami bergaransi 30 hari. Jika ada kerusakan, silakan hubungi kami dengan menyertakan foto/video sebagai bukti.' },
-  ],
-  en: [
-    { keywords: ['stock', 'available', 'ready'], reply: 'For current stock information, please check directly on the product page. If you have a specific product in mind, let us know the name!' },
-    { keywords: ['price', 'expensive', 'cheap', 'discount', 'promo'], reply: 'Product prices are listed in our catalog. We also offer special discounts for wholesale purchases. Contact admin for more info.' },
-    { keywords: ['ship', 'shipping', 'delivery', 'arrive', 'cod'], reply: 'We ship nationwide via JNE, J&T, and SiCepat. COD is available for Palembang area. Estimated 2-5 business days.' },
-    { keywords: ['pay', 'transfer', 'payment', 'bca', 'bri'], reply: 'Payment can be made via BCA, BRI, Mandiri bank transfer, or COD. For transfers, please use the account provided at checkout.' },
-    { keywords: ['warranty', 'return', 'refund', 'damage', 'exchange'], reply: 'All our products come with a 30-day warranty. If there is any damage, please contact us with photo/video evidence.' },
-  ],
-}
-
-const GREETING: Record<string, { user: string; admin: string }> = {
-  id: { user: 'Halo! Ada yang bisa kami bantu?', admin: 'Halo! Ada yang bisa kami bantu?' },
-  en: { user: 'Hello! How can we help you?', admin: 'Hello! How can we help you?' },
-}
-
-function findReply(text: string, lang: string): string | null {
-  const lower = text.toLowerCase()
-  const replies = AUTO_REPLIES[lang] || AUTO_REPLIES.id
-  for (const entry of replies) {
-    if (entry.keywords.some(k => lower.includes(k))) {
-      return entry.reply
-    }
-  }
-  return null
-}
-
-function loadMessages(): ChatMessage[] {
+function getSessionId(): string {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch { return [] }
+    let id = localStorage.getItem(SESSION_KEY)
+    if (!id) {
+      id = 'session_' + Math.random().toString(36).slice(2, 10)
+      localStorage.setItem(SESSION_KEY, id)
+    }
+    return id
+  } catch {
+    return 'session_' + Math.random().toString(36).slice(2, 10)
+  }
 }
-
-let msgIdCounter = 0
-function nextId(): string { return `msg_${Date.now()}_${++msgIdCounter}` }
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isOpen, setIsOpen] = useState(false)
-  const [loaded, setLoaded] = useState(false)
-  const adminTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [unread, setUnread] = useState(0)
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const sessionId = useRef('')
 
   useEffect(() => {
-    const saved = loadMessages()
-    if (saved.length === 0) {
-      const lang = navigator.language?.startsWith('id') ? 'id' : 'en'
-      const greeting: ChatMessage = {
-        id: nextId(),
-        text: GREETING[lang].admin,
-        sender: 'admin',
-        timestamp: new Date().toISOString(),
-      }
-      setMessages([greeting])
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([greeting]))
-    } else {
-      setMessages(saved)
+    sessionId.current = getSessionId()
+    syncMessages()
+    pollingRef.current = setInterval(syncMessages, 3000)
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current)
     }
-    setLoaded(true)
   }, [])
 
-  useEffect(() => {
-    if (loaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
-    }
-  }, [messages, loaded])
-
-  const addMessage = useCallback((text: string, sender: ChatSender): ChatMessage => {
-    const msg: ChatMessage = {
-      id: nextId(),
-      text,
-      sender,
-      timestamp: new Date().toISOString(),
-    }
-    setMessages(prev => [...prev, msg])
-    return msg
+  const syncMessages = useCallback(async () => {
+    if (!sessionId.current) return
+    try {
+      const res = await fetch(`/api/chat?sessionId=${sessionId.current}`)
+      if (!res.ok) return
+      const data = await res.json()
+      const msgs: ChatMessage[] = (data.messages || []).map((m: any) => ({
+        id: m.id,
+        text: m.text,
+        sender: m.sender as ChatSender,
+        timestamp: m.createdAt,
+      }))
+      setMessages(msgs)
+      setUnread(msgs.filter(m => m.sender === 'admin' && !m.read).length)
+    } catch {}
   }, [])
 
-  const sendMessage = useCallback((text: string, lang: 'id' | 'en' = 'id') => {
+  const sendMessage = useCallback((text: string, lang?: 'id' | 'en') => {
     if (!text.trim()) return
-    addMessage(text.trim(), 'user')
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.trim(), sessionId: sessionId.current, lang: lang || 'id' }),
+    }).then(() => syncMessages())
+  }, [syncMessages])
 
-    if (adminTimerRef.current) clearTimeout(adminTimerRef.current)
+  const openChat = useCallback(() => {
+    setIsOpen(true)
+    setUnread(0)
+  }, [])
 
-    adminTimerRef.current = setTimeout(() => {
-      const reply = findReply(text, lang)
-      if (reply) {
-        addMessage(reply, 'admin')
-      } else {
-        const generic = lang === 'id'
-          ? 'Mohon tunggu, admin kami akan segera merespon pesan Anda.'
-          : 'Please wait, our admin will respond to your message shortly.'
-        addMessage(generic, 'admin')
-      }
-    }, ADMIN_DELAY)
-  }, [addMessage])
-
-  const openChat = useCallback(() => setIsOpen(true), [])
   const closeChat = useCallback(() => setIsOpen(false), [])
-  const toggleChat = useCallback(() => setIsOpen(prev => !prev), [])
-
-  const unread = messages.filter(m => m.sender === 'admin' && !m.read).length
+  const toggleChat = useCallback(() => setIsOpen(o => !o), [])
 
   return (
     <ChatContext.Provider value={{

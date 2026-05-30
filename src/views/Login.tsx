@@ -29,19 +29,21 @@ export default function Login() {
 
   if (isLoggedIn) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
     if (role === 'admin') {
-      if (login(form.username, form.password)) {
+      const ok = await login(form.username, form.password)
+      if (ok) {
         router.replace('/admin')
       } else {
         setError(lang === 'id' ? 'Username atau password salah' : 'Invalid username or password')
       }
     } else {
       if (tab === 'login') {
-        if (login(form.username, form.password)) {
+        const ok = await login(form.username, form.password)
+        if (ok) {
           router.replace('/')
         } else {
           setError(lang === 'id' ? 'Akun tidak ditemukan. Cek No. HP dan password' : 'Account not found. Check phone and password')
@@ -51,7 +53,8 @@ export default function Login() {
           setError(lang === 'id' ? 'Password tidak cocok' : 'Passwords do not match')
           return
         }
-        if (register({ name: form.name, phone: form.phone, password: form.password })) {
+        const ok = await register({ name: form.name, phone: form.phone, password: form.password })
+        if (ok) {
           router.replace('/')
         } else {
           setError(lang === 'id' ? 'No. HP sudah terdaftar' : 'Phone number already registered')

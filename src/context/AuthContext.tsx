@@ -1,10 +1,13 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
-import type { User, Session, UserRole } from '../types'
+'use client'
+
+import { createContext, useContext, useCallback, type ReactNode } from 'react'
+import { useSession, signIn, signOut } from 'next-auth/react'
+import type { Session } from 'next-auth'
 
 interface AuthContextValue {
-  user: Session | null
-  login: (username: string, password: string) => boolean
-  register: (data: { name: string; phone: string; password: string }) => boolean
+  user: { username: string; role: string; name: string; phone?: string } | null
+  login: (username: string, password: string) => Promise<boolean>
+  register: (data: { name: string; phone: string; password: string }) => Promise<boolean>
   logout: () => void
   isAdmin: boolean
   isClient: boolean
@@ -13,71 +16,48 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue>(null!)
-const USERS_KEY = 'dunia-pancing-users'
-const SESSION_KEY = 'dunia-pancing-session'
-
-const DEFAULT_ADMIN: User = {
-  username: 'admin',
-  password: 'admin123',
-  role: 'admin',
-  name: 'Admin',
-}
-
-function loadUsers(): User[] {
-  try {
-    const raw = localStorage.getItem(USERS_KEY)
-    const users: User[] = raw ? JSON.parse(raw) : []
-    const hasAdmin = users.some(u => u.role === 'admin')
-    if (!hasAdmin) users.push(DEFAULT_ADMIN)
-    return users
-  } catch {
-    return [DEFAULT_ADMIN]
-  }
-}
-
-function loadSession(): Session | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch { return null }
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<Session | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const { data: session, status } = useSession()
 
-  useEffect(() => {
-    const session = loadSession()
-    setUser(session)
-    setLoaded(true)
+  const user = session?.user
+    ? {
+        username: (session.user as any).username || session.user.email || '',
+        role: (session.user as any).role || 'client',
+        name: session.user.name || '',
+      }
+    : null
+
+  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
+    const result = await signIn('credentials', {
+      username,
+      password,
+      redirect: false,
+    })
+    return !result?.error
   }, [])
 
-  const login = useCallback((username: string, password: string): boolean => {
-    const users = loadUsers()
-    const found = users.find(u => u.username === username && u.password === password)
-    if (!found) return false
-    const session: Session = { username: found.username, role: found.role as UserRole, name: found.name }
-    setUser(session)
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    return true
-  }, [])
-
-  const register = useCallback(({ name, phone, password }: { name: string; phone: string; password: string }): boolean => {
-    const users = loadUsers()
-    const exists = users.some(u => u.username === phone)
-    if (exists) return false
-    const newUser: User = { username: phone, password, role: 'client', name, phone }
-    users.push(newUser)
-    localStorage.setItem(USERS_KEY, JSON.stringify(users))
-    const session: Session = { username: newUser.username, role: 'client', name: newUser.name }
-    setUser(session)
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    return true
+  const register = useCallback(async ({ name, phone, password }: { name: string; phone: string; password: string }): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: phone, password, name, phone }),
+      })
+      if (!res.ok) return false
+      const result = await signIn('credentials', {
+        username: phone,
+        password,
+        redirect: false,
+      })
+      return !result?.error
+    } catch {
+      return false
+    }
   }, [])
 
   const logout = useCallback(() => {
-    setUser(null)
-    localStorage.removeItem(SESSION_KEY)
+    signOut({ callbackUrl: '/login' })
   }, [])
 
   return (
@@ -89,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAdmin: user?.role === 'admin',
       isClient: user?.role === 'client',
       isLoggedIn: !!user,
-      loaded,
+      loaded: status !== 'loading',
     }}>
       {children}
     </AuthContext.Provider>

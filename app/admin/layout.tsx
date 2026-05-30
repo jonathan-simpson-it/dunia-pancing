@@ -16,6 +16,8 @@ const sidebarLinks = [
   { to: '/admin', label_id: 'Produk', label_en: 'Products', icon: '📦' },
   { to: '/admin/orders', label_id: 'Pesanan', label_en: 'Orders', icon: '📋' },
   { to: '/admin/add', label_id: 'Tambah Produk', label_en: 'Add Product', icon: '➕' },
+  { to: '/admin/vouchers', label_id: 'Voucher', label_en: 'Vouchers', icon: '🏷️' },
+  { to: '/admin/chat', label_id: 'Chat', label_en: 'Chat', icon: '💬' },
   { to: '/admin/import', label_id: 'Import Harga', label_en: 'Price Import', icon: '📥' },
   { to: '/admin/revenue', label_id: 'Pendapatan', label_en: 'Revenue', icon: '💰' },
 ]

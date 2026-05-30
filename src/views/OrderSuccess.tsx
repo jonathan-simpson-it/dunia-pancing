@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
@@ -14,11 +15,77 @@ const localeId = id as Record<string, string>
 const localeEn = en as Record<string, string>
 const t = (key: string, lang: 'id' | 'en'): string => lang === 'id' ? localeId[key] : localeEn[key]
 
+function mapDbOrderToLocal(dbo: any): Order {
+  return {
+    id: dbo.orderNumber || dbo.id,
+    date: dbo.createdAt,
+    status: dbo.status,
+    items: (dbo.items || []).map((i: any) => ({
+      id: i.productId || i.product?.id || i.id,
+      name_id: i.nameId || i.name_id,
+      name_en: i.nameEn || i.name_en,
+      image: i.image || '',
+      price_idr: i.priceIdr ?? i.price_idr ?? 0,
+      qty: i.qty ?? 1,
+    })),
+    customer: {
+      name: dbo.customerName,
+      phone: dbo.customerPhone,
+      address: dbo.customerAddress || '',
+      city: dbo.customerCity || '',
+      notes: dbo.customerNote,
+    },
+    shipping: {
+      id: dbo.courier || '',
+      label: dbo.shippingLabel || '',
+      fee: dbo.shippingFee ?? 0,
+    },
+    payment: {
+      id: '',
+      label: dbo.paymentMethod || '',
+      method: dbo.paymentType || '',
+      bank: dbo.paymentBank || '',
+      accountNumber: '',
+    },
+    subtotal: dbo.subtotal ?? 0,
+    shipping_fee: dbo.shippingFee ?? 0,
+    total: dbo.total ?? 0,
+    statusHistory: (dbo.statusHistory || []).map((h: any) => ({
+      status: h.status,
+      timestamp: h.timestamp,
+      note: h.note,
+    })),
+  }
+}
+
 export default function OrderSuccess() {
   const params = useParams()
   const orderId = params.orderId as string
   const { lang } = useLang()
-  const order: Order | null = getOrder(orderId || '')
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!orderId) return
+    const local = getOrder(orderId)
+    if (local) {
+      setOrder(local)
+      setLoading(false)
+      return
+    }
+    fetch(`/api/orders?pageSize=1`, { cache: 'no-store' })
+      .then(r => r.json())
+      .then(data => {
+        const found = data.orders?.find((o: any) => o.id === orderId || o.orderNumber === orderId)
+        if (found) {
+          setOrder(mapDbOrderToLocal(found))
+        }
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [orderId])
+
+  if (loading) return null
 
   const formatPrice = (amount: number) =>
     new Intl.NumberFormat('id-ID', {

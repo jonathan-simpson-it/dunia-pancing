@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import { useCart } from '../context/CartContext'
-import { useProducts } from '../context/ProductStore'
 import StepIndicator from '../components/ui/StepIndicator'
 import { formatIDR } from '../utils/formatters'
-import { createOrder, SHIPPING_METHODS, PAYMENT_METHODS, buildWhatsAppMessage } from '../utils/order'
+import { SHIPPING_METHODS, PAYMENT_METHODS } from '../utils/order'
 import type { FormErrors } from '../types'
 import id from '../locales/id.json'
 import en from '../locales/en.json'
@@ -21,7 +20,6 @@ export default function Checkout() {
   const { lang } = useLang()
   const router = useRouter()
   const { items, subtotal, clearCart } = useCart()
-  const { updateProduct, getProduct } = useProducts()
   const [step, setStep] = useState(0)
   const [customer, setCustomer] = useState({
     name: '', phone: '', address: '', city: 'Palembang', notes: '',
@@ -30,6 +28,32 @@ export default function Checkout() {
   const [paymentId, setPaymentId] = useState('bca')
   const [errors, setErrors] = useState<FormErrors>({})
   const [placing, setPlacing] = useState(false)
+  const [voucherCode, setVoucherCode] = useState('')
+  const [voucherDiscount, setVoucherDiscount] = useState(0)
+  const [voucherError, setVoucherError] = useState('')
+  const [voucherApplied, setVoucherApplied] = useState(false)
+
+  const applyVoucher = async () => {
+    if (!voucherCode.trim()) return
+    const res = await fetch('/api/vouchers/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: voucherCode, subtotal, shopId: 'default' }),
+    })
+    const data = await res.json()
+    if (data.valid) {
+      const discount = data.voucher.type === 'PERCENTAGE'
+        ? Math.round(subtotal * data.voucher.value / 100)
+        : Math.min(data.voucher.value, subtotal)
+      setVoucherDiscount(discount)
+      setVoucherApplied(true)
+      setVoucherError('')
+    } else {
+      setVoucherError(data.error || 'Voucher tidak valid')
+      setVoucherDiscount(0)
+      setVoucherApplied(false)
+    }
+  }
 
   const steps = [
     t('checkout_step_customer', lang),
@@ -40,6 +64,7 @@ export default function Checkout() {
 
   const shipping = SHIPPING_METHODS.find(s => s.id === shippingId)!
   const payment = PAYMENT_METHODS.find(p => p.id === paymentId)!
+  const total = subtotal + shipping.fee - voucherDiscount
 
   const validateCustomer = (): boolean => {
     const errs: FormErrors = {}
@@ -68,43 +93,81 @@ export default function Checkout() {
 
   const isWalkinPayment = payment.type === 'pay_store' || payment.type === 'cod'
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     setPlacing(true)
-    const order = createOrder({
-      items,
-      subtotal,
-      customer,
-      shipping: {
-        id: shipping.id,
-        label: lang === 'id' ? shipping.label_id : shipping.label_en,
-        fee: shipping.fee,
-      },
-      payment: {
-        id: payment.id,
-        label: lang === 'id' ? payment.label_id : payment.label_en,
-        method: payment.type,
-        bank: payment.bank,
-        accountNumber: payment.accountNumber,
-      },
-    })
-    clearCart()
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({
+            name_id: i.name_id,
+            name_en: i.name_en,
+            image: i.image,
+            price_idr: i.price_idr,
+            qty: i.qty,
+            variantId: i.variantId,
+            variantLabel: i.variantLabel,
+          })),
+          subtotal,
+          discount: voucherDiscount,
+          total: subtotal + shipping.fee - voucherDiscount,
+          customer: {
+            name: customer.name,
+            phone: customer.phone,
+            address: customer.address,
+            city: customer.city,
+            notes: customer.notes,
+          },
+          shipping: {
+            id: shipping.id,
+            label: lang === 'id' ? shipping.label_id : shipping.label_en,
+            fee: shipping.fee,
+          },
+          payment: {
+            id: payment.id,
+            label: lang === 'id' ? payment.label_id : payment.label_en,
+            method: payment.type,
+            bank: payment.bank,
+          },
+        }),
+      })
 
-    order.items.forEach(item => {
-      const prod = getProduct(item.id)
-      if (prod) {
-        updateProduct(item.id, { sold_count: (prod.sold_count || 0) + item.qty })
+      if (!res.ok) throw new Error('Failed to create order')
+      const order = await res.json()
+      clearCart()
+
+      if (!isWalkinPayment) {
+        const invRes = await fetch('/api/payments/create-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            amount: order.total,
+            description: `Pesanan ${order.orderNumber}`,
+            successRedirectUrl: `${window.location.origin}/order-success/${order.orderNumber}`,
+            customerName: customer.name,
+            customerPhone: customer.phone,
+            items: items.map(i => ({
+              name: lang === 'id' ? i.name_id : i.name_en,
+              quantity: i.qty,
+              price: i.price_idr,
+            })),
+          }),
+        })
+
+        if (invRes.ok) {
+          const invoice = await invRes.json()
+          window.location.href = invoice.invoice_url
+          return
+        }
       }
-    })
 
-    if (!isWalkinPayment) {
-      const msg = buildWhatsAppMessage(order, lang)
-      window.open(
-        `https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`,
-        '_blank'
-      )
+      router.push(`/order-success/${order.orderNumber}`)
+    } catch (err) {
+      console.error('Place order error:', err)
+      setPlacing(false)
     }
-
-      router.push(`/order-success/${order.id}`)
   }
 
   if (items.length === 0 && step === 0) {
@@ -345,6 +408,30 @@ export default function Checkout() {
                   )}
                 </div>
 
+                <div className="p-4 bg-slate-50 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Voucher</span>
+                    {!voucherApplied ? (
+                      <div className="flex items-center gap-2">
+                        <input type="text" value={voucherCode} onChange={e => setVoucherCode(e.target.value)}
+                          placeholder="KODE VOUCHER"
+                          className="px-3 py-1.5 border border-slate-200 rounded-lg text-[11px] w-28 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 uppercase" />
+                        <button onClick={applyVoucher}
+                          className="px-3 py-1.5 bg-brand-primary text-white text-[11px] font-bold rounded-lg hover:bg-sky-600">
+                          Pakai
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold text-emerald-600">✅ {voucherCode}</span>
+                        <button onClick={() => { setVoucherApplied(false); setVoucherCode(''); setVoucherDiscount(0) }}
+                          className="text-[10px] text-slate-400 hover:text-red-500">Hapus</button>
+                      </div>
+                    )}
+                  </div>
+                  {voucherError && <p className="text-[11px] text-red-500 mt-1">{voucherError}</p>}
+                </div>
+
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 block">
                     {lang === 'id' ? 'Pesanan' : 'Order Items'}
@@ -375,9 +462,15 @@ export default function Checkout() {
                     <span className="text-slate-600">{t('cart_shipping', lang)}</span>
                     <span className="font-semibold text-slate-900">{shipping.fee === 0 ? (lang === 'id' ? 'Gratis' : 'Free') : formatIDR(shipping.fee)}</span>
                   </div>
+                  {voucherDiscount > 0 && (
+                    <div className="flex justify-between text-[13px]">
+                      <span className="text-emerald-600 font-semibold">{lang === 'id' ? 'Diskon Voucher' : 'Voucher Discount'}</span>
+                      <span className="font-semibold text-emerald-600">-{formatIDR(voucherDiscount)}</span>
+                    </div>
+                  )}
                   <div className="border-t border-slate-200 pt-2 flex justify-between text-base">
                     <span className="font-bold text-slate-900">{t('cart_total', lang)}</span>
-                    <span className="font-bold text-brand-primary">{formatIDR(subtotal + shipping.fee)}</span>
+                    <span className="font-bold text-brand-primary">{formatIDR(total)}</span>
                   </div>
                 </div>
               </div>

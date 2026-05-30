@@ -1,6 +1,6 @@
 // Toggle between mock and real KiriminAja API
 // Set to true when the backend proxy server is running with a valid API key
-export const USE_KIRIMINAJA_API = false
+export const USE_KIRIMINAJA_API = true
 
 // Default store origin (Palembang) — kecamatan_id for KiriminAja
 export const STORE_KECAMATAN_ID = 548 // Palembang Ilir Timur I

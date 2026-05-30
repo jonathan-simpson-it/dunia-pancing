@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
@@ -42,6 +42,10 @@ export default function ProductDetail() {
   const { addToCart } = useCart()
   const { user } = useAuth()
   const { products, getProduct, getCategoryName } = useProducts()
+  const [reviews, setReviews] = useState<any[]>([])
+  const [reviewForm, setReviewForm] = useState({ rating: 5, text: '' })
+  const [reviewSubmitted, setReviewSubmitted] = useState(false)
+  const [reviewLoading, setReviewLoading] = useState(false)
   const [selectedImg, setSelectedImg] = useState(0)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
@@ -58,6 +62,34 @@ export default function ProductDetail() {
   }, [product, products])
 
   const hasVariants = product?.variantTypes && product.variantTypes.length > 0
+
+  useEffect(() => {
+    if (productId) {
+      fetch(`/api/products/${productId}/reviews`)
+        .then(r => r.json())
+        .then(setReviews)
+        .catch(() => {})
+    }
+  }, [productId])
+
+  const submitReview = async () => {
+    setReviewLoading(true)
+    try {
+      const res = await fetch(`/api/products/${productId}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewForm),
+      })
+      if (res.ok) {
+        setReviewSubmitted(true)
+        setReviewForm({ rating: 5, text: '' })
+        const updated = await fetch(`/api/products/${productId}/reviews`).then(r => r.json())
+        setReviews(updated)
+      }
+    } finally {
+      setReviewLoading(false)
+    }
+  }
 
   const activeVariant = useMemo(() => {
     if (!hasVariants || !product) return null
@@ -434,20 +466,52 @@ export default function ProductDetail() {
           <div className="mb-8">
             <h2 className="text-base font-bold text-slate-900 mb-4">
               {t('product_detail_reviews', lang)}
-              {product.rating && <span className="ml-2 font-normal text-slate-400">({t('product_sold_count', lang)} {formatSold(product.sold_count)})</span>}
+              {reviews.length > 0 && <span className="ml-2 font-normal text-slate-400">({reviews.length} {lang === 'id' ? 'ulasan' : 'reviews'})</span>}
             </h2>
-            <div className="bg-slate-50 rounded-xl border border-slate-100 p-6 text-center">
-              {product.rating && (
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <span className="text-3xl font-bold text-slate-900">{product.rating}</span>
-                  <div className="text-left">
-                    <StarRating rating={product.rating} size={16} />
-                    <div className="text-[11px] text-slate-400 mt-0.5">{formatSold(product.sold_count)} {t('product_detail_reviews', lang).toLowerCase()}</div>
-                  </div>
+
+            <div className="space-y-4 mb-6">
+              {reviews.length === 0 ? (
+                <div className="bg-slate-50 rounded-xl border border-slate-100 p-6 text-center">
+                  <p className="text-slate-400 text-sm">{lang === 'id' ? 'Belum ada ulasan' : 'No reviews yet'}</p>
                 </div>
+              ) : (
+                reviews.map(r => (
+                  <div key={r.id} className="bg-white rounded-xl border border-slate-100 p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <StarRating rating={r.rating} size={14} />
+                      <span className="text-[11px] text-slate-400">{new Date(r.createdAt).toLocaleDateString('id-ID')}</span>
+                    </div>
+                    {r.user?.name && <p className="text-[11px] font-semibold text-slate-600 mb-1">{r.user.name}</p>}
+                    {r.text && <p className="text-[13px] text-slate-700">{r.text}</p>}
+                  </div>
+                ))
               )}
-              <p className="text-slate-400 text-sm">{lang === 'id' ? 'Belum ada ulasan tertulis' : 'No written reviews yet'}</p>
             </div>
+
+            {!reviewSubmitted ? (
+              <div className="bg-slate-50 rounded-xl border border-slate-100 p-5">
+                <h3 className="text-[13px] font-bold text-slate-900 mb-3">{lang === 'id' ? 'Tulis Ulasan' : 'Write a Review'}</h3>
+                <div className="flex items-center gap-1 mb-3">
+                  {[1,2,3,4,5].map(star => (
+                    <button key={star} onClick={() => setReviewForm({...reviewForm, rating: star})}
+                      className={`text-xl transition-all ${star <= reviewForm.rating ? 'text-yellow-400' : 'text-slate-300'}`}>
+                      ★
+                    </button>
+                  ))}
+                </div>
+                <textarea value={reviewForm.text} onChange={e => setReviewForm({...reviewForm, text: e.target.value})}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12px] focus:outline-none focus:ring-2 focus:ring-brand-primary/30 resize-none mb-3" rows={3}
+                  placeholder={lang === 'id' ? 'Bagikan pengalamanmu...' : 'Share your experience...'} />
+                <button onClick={submitReview} disabled={reviewLoading}
+                  className="px-5 py-2 bg-brand-primary text-white text-[12px] font-bold rounded-lg hover:bg-sky-600 disabled:opacity-50">
+                  {reviewLoading ? (lang === 'id' ? 'Mengirim...' : 'Sending...') : (lang === 'id' ? 'Kirim Ulasan' : 'Submit Review')}
+                </button>
+              </div>
+            ) : (
+              <p className="text-emerald-600 text-[13px] font-semibold">
+                ✅ {lang === 'id' ? 'Ulasan terkirim!' : 'Review submitted!'}
+              </p>
+            )}
           </div>
         </div>
 

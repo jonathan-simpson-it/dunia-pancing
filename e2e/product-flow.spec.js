@@ -13,7 +13,7 @@ test.describe('Product Detail & Catalog Edge Cases', () => {
 
   test('Visiting a non-existent product shows not-found message', async ({ page }) => {
     await page.goto('/product/nonexistent-999')
-    await expect(page.getByText(/produk tidak ditemukan/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /produk tidak ditemukan/i })).toBeVisible()
   })
 
   test('Product detail page shows product name and price', async ({ page }) => {
@@ -28,7 +28,7 @@ test.describe('Product Detail & Catalog Edge Cases', () => {
 
   test('Reviews section is visible', async ({ page }) => {
     await page.goto('/product/dp-002')
-    await expect(page.getByRole('heading', { name: /ulasan|reviews/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /^Ulasan$|^Reviews$/i }).first()).toBeVisible()
   })
 
   test('Out of stock product badge is shown', async ({ page }) => {

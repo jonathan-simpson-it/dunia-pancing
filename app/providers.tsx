@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { SessionProvider } from 'next-auth/react'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { ProductStoreProvider } from '@/context/ProductStore'
@@ -15,25 +16,27 @@ import ScrollToTop from '@/components/ui/ScrollToTop'
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <ProductStoreProvider>
-          <CartProvider>
-            <SearchProvider>
-              <ChatProvider>
-                <ScrollToTop />
-                <div className="min-h-screen flex flex-col">
-                  <Navbar />
-                  <main className="flex-1">{children}</main>
-                  <Footer />
-                  <ChatButton />
-                  <ChatWindow />
-                </div>
-              </ChatProvider>
-            </SearchProvider>
-          </CartProvider>
-        </ProductStoreProvider>
-      </AuthProvider>
-    </LanguageProvider>
+    <SessionProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <ProductStoreProvider>
+            <CartProvider>
+              <SearchProvider>
+                <ChatProvider>
+                  <ScrollToTop />
+                  <div className="min-h-screen flex flex-col">
+                    <Navbar />
+                    <main className="flex-1">{children}</main>
+                    <Footer />
+                    <ChatButton />
+                    <ChatWindow />
+                  </div>
+                </ChatProvider>
+              </SearchProvider>
+            </CartProvider>
+          </ProductStoreProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </SessionProvider>
   )
 }
