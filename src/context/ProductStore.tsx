@@ -66,6 +66,51 @@ function loadProducts(): Product[] {
   return seeded as Product[]
 }
 
+function apiProductToLocal(p: any): Product {
+  return migrateProduct({
+    id: p.id,
+    name_id: p.nameId,
+    name_en: p.nameEn || p.nameId,
+    category: p.category || '',
+    brand: p.brand || '',
+    specifications: (() => { try { return JSON.parse(p.specifications || '[]') } catch { return [] } })(),
+    price_idr: p.priceIdr,
+    original_price_idr: p.originalPriceIdr || 0,
+    stock_qty: p.stockQty,
+    weight: p.weight || 0,
+    in_stock: p.inStock,
+    sold_count: p.soldCount,
+    rating: p.rating,
+    location: p.location || '',
+    image: p.image || '',
+    images: (() => { try { return JSON.parse(p.images || '[]') } catch { return [] } })(),
+    description_id: p.descriptionId || '',
+    description_en: p.descriptionEn || '',
+    key_features: (() => { try { return JSON.parse(p.keyFeatures || '[]') } catch { return [] } })(),
+    features: (() => { try { return JSON.parse(p.features || '[]') } catch { return [] } })(),
+    variantTypes: p.variantTypes || [],
+    variants: (p.productVariants || []).map((v: any) => ({
+      id: v.id,
+      sku: v.sku || '',
+      combination: typeof v.combination === 'string' ? JSON.parse(v.combination) : (v.combination || {}),
+      price_idr: v.priceIdr ?? v.price_idr ?? 0,
+      original_price_idr: v.originalPriceIdr ?? v.original_price_idr,
+      stock_qty: v.stockQty ?? v.stock_qty ?? 0,
+      weight: v.weight ?? 0,
+      image: v.image || '',
+    })),
+    wishlistCount: p.wishlistCount || 0,
+    shippingEstimateDays: {
+      min: p.shippingEstimateMin || 2,
+      max: p.shippingEstimateMax || 5,
+    },
+    sizeChart: (p.sizeChartEntries || []).map((e: any) => ({
+      label: e.label,
+      value: e.value,
+    })),
+  })
+}
+
 function loadCategories(): Category[] {
   try {
     const raw = localStorage.getItem(CATEGORIES_KEY)
@@ -81,10 +126,40 @@ export function ProductStoreProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    setProducts(loadProducts())
+    const stored = loadProducts()
+    setProducts(stored)
     setCategories(loadCategories())
     setLoaded(true)
   }, [])
+
+  useEffect(() => {
+    if (!loaded) return
+    fetch('/api/products')
+      .then(r => r.ok ? r.json() : [])
+      .then((apiProducts: any[]) => {
+        if (!apiProducts || apiProducts.length === 0) return
+        const seedIds = new Set((seed as any[]).map(p => p.id))
+        const apiEntries: [string, Product][] = apiProducts.map((p: any) => [p.id, apiProductToLocal(p)])
+        const apiIds = new Set(apiEntries.map(e => e[0]))
+        const apiMap = new Map(apiEntries)
+        setProducts(prev => {
+          const next: Product[] = []
+          for (const p of prev) {
+            if (apiMap.has(p.id) || seedIds.has(p.id)) {
+              next.push(apiMap.has(p.id) ? apiMap.get(p.id)! : p)
+            }
+          }
+          const newOnes: Product[] = []
+          for (const [id, p] of apiEntries) {
+            if (!prev.some(x => x.id === id)) newOnes.push(p)
+          }
+          if (newOnes.length === 0 && next.length === prev.length &&
+              next.every((p, i) => p === prev[i])) return prev
+          return [...newOnes, ...next]
+        })
+      })
+      .catch(() => {})
+  }, [loaded])
 
   useEffect(() => {
     if (loaded) {
@@ -103,7 +178,11 @@ export function ProductStoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateProduct = useCallback((id: string, updates: Partial<Product>) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p))
+    setProducts(prev => {
+      const exists = prev.some(p => p.id === id)
+      if (exists) return prev.map(p => p.id === id ? { ...p, ...updates } : p)
+      return [{ ...updates, id } as Product, ...prev]
+    })
   }, [])
 
   const deleteProduct = useCallback((id: string) => {
@@ -133,12 +212,8 @@ export function ProductStoreProvider({ children }: { children: ReactNode }) {
   }, [products])
 
   const nextId = useCallback((): string => {
-    const max = products.reduce((m, p) => {
-      const num = parseInt(p.id.replace('dp-', ''), 10)
-      return num > m ? num : m
-    }, 0)
-    return 'dp-' + String(max + 1).padStart(3, '0')
-  }, [products])
+    return 'dp-' + Date.now().toString(36)
+  }, [])
 
   const addCategory = useCallback(({ key, name_id, name_en, icon }: { key: string; name_id: string; name_en: string; icon: string }): boolean => {
     const exists = categories.some(c => c.key === key)

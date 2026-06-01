@@ -72,9 +72,10 @@ export default function AdminDashboard() {
     })
   }
 
-  const saveEdit = (id: string) => {
+  const saveEdit = async (id: string) => {
     const images = editForm.images || []
-    updateProduct(id, {
+    const product = products.find(p => p.id === id)
+    const updates = {
       ...editForm,
       price_idr: Number(editForm.price_idr),
       original_price_idr: Number(editForm.original_price_idr) || Number(editForm.price_idr),
@@ -85,16 +86,35 @@ export default function AdminDashboard() {
         min: Number(editForm.shippingEstimateMin) || 3,
         max: Number(editForm.shippingEstimateMax) || 7,
       },
-    })
+    }
+    updateProduct(id, updates)
+    try {
+      await fetch(`/api/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...updates,
+          variantTypes: product?.variantTypes || [],
+          variants: product?.variants || [],
+        }),
+      })
+    } catch (err) {
+      console.error('Failed to sync edit to DB:', err)
+    }
     setEditingId(null)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     deleteProduct(id)
+    try {
+      await fetch(`/api/products/${id}`, { method: 'DELETE' })
+    } catch (err) {
+      console.error('Failed to delete from DB:', err)
+    }
     setConfirmDelete(null)
   }
 
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault()
     setCatError('')
     const key = catForm.key.trim().toLowerCase().replace(/\s+/g, '_')
@@ -102,6 +122,15 @@ export default function AdminDashboard() {
     if (!ok) {
       setCatError(lang === 'id' ? 'Kategori dengan key tersebut sudah ada' : 'Category with this key already exists')
       return
+    }
+    try {
+      await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, nameId: catForm.name_id.trim(), nameEn: catForm.name_en.trim() || catForm.name_id.trim(), icon: catForm.icon.trim() || '📦' }),
+      })
+    } catch (err) {
+      console.error('Failed to sync category to DB:', err)
     }
     setShowAddCat(false)
     setCatForm({ key: '', name_id: '', name_en: '', icon: '' })
@@ -112,20 +141,38 @@ export default function AdminDashboard() {
     setEditCatForm({ name_id: cat.name_id, name_en: cat.name_en, icon: cat.icon || '' })
   }
 
-  const saveEditCat = (key: string) => {
+  const saveEditCat = async (key: string) => {
     renameCategory(key, {
       name_id: editCatForm.name_id.trim(),
       name_en: editCatForm.name_en.trim() || editCatForm.name_id.trim(),
       icon: editCatForm.icon.trim() || '📦',
     })
+    try {
+      await fetch(`/api/categories/${key}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nameId: editCatForm.name_id.trim(),
+          nameEn: editCatForm.name_en.trim() || editCatForm.name_id.trim(),
+          icon: editCatForm.icon.trim() || '📦',
+        }),
+      })
+    } catch (err) {
+      console.error('Failed to sync category edit to DB:', err)
+    }
     setEditingCat(null)
   }
 
-  const handleDeleteCat = (key: string) => {
+  const handleDeleteCat = async (key: string) => {
     const ok = deleteCategory(key)
     if (!ok) {
       setCatError(lang === 'id' ? 'Tidak bisa menghapus kategori yang masih memiliki produk' : 'Cannot delete category with existing products')
       setTimeout(() => setCatError(''), 3000)
+    }
+    try {
+      await fetch(`/api/categories/${key}`, { method: 'DELETE' })
+    } catch (err) {
+      console.error('Failed to sync category delete to DB:', err)
     }
     setCatDeleteConfirm(null)
   }
@@ -272,8 +319,29 @@ export default function AdminDashboard() {
                                 <VariantBuilder
                                   variantTypes={p.variantTypes || []}
                                   variants={p.variants || []}
-                                  onChange={(newTypes, newVariants) => {
+                                  onChange={async (newTypes, newVariants) => {
                                     updateProduct(p.id, { variantTypes: newTypes, variants: newVariants })
+                                    try {
+                                      await fetch(`/api/products/${p.id}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                          nameId: p.name_id,
+                                          nameEn: p.name_en,
+                                          priceIdr: p.price_idr,
+                                          stockQty: p.stock_qty,
+                                          inStock: p.in_stock,
+                                          category: p.category,
+                                          brand: p.brand,
+                                          image: p.image,
+                                          images: p.images,
+                                          variantTypes: newTypes,
+                                          variants: newVariants,
+                                        }),
+                                      })
+                                    } catch (err) {
+                                      console.error('Failed to sync variants to DB:', err)
+                                    }
                                   }}
                                 />
                               </td>

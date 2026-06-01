@@ -102,10 +102,21 @@ export default function AdminImport() {
     handleFile(e.target.files?.[0])
   }
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (!preview) return
     const updates = preview.map(p => ({ id: p.id, name: p.name, price_idr: p.price_idr }))
-    importPrices(updates)
+    const changed = importPrices(updates)
+    for (const p of changed) {
+      try {
+        await fetch(`/api/products/${p.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priceIdr: p.new }),
+        })
+      } catch (err) {
+        console.error(`Failed to sync price for ${p.id}:`, err)
+      }
+    }
     setApplied(true)
     setPreview(null)
     if (fileRef.current) fileRef.current.value = ''

@@ -41,11 +41,14 @@ export default function ProductDetail() {
   const router = useRouter()
   const { addToCart } = useCart()
   const { user } = useAuth()
-  const { products, getProduct, getCategoryName } = useProducts()
+  const { products, getProduct, getCategoryName, updateProduct } = useProducts()
   const [reviews, setReviews] = useState<any[]>([])
   const [reviewForm, setReviewForm] = useState({ rating: 5, text: '' })
+  const [reviewImages, setReviewImages] = useState<string[]>([])
   const [reviewSubmitted, setReviewSubmitted] = useState(false)
-  const [reviewLoading, setReviewLoading] = useState(false)
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
+  const [reviewError, setReviewError] = useState('')
+  const [reviewsLoading, setReviewsLoading] = useState(true)
   const [selectedImg, setSelectedImg] = useState(0)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
@@ -64,30 +67,118 @@ export default function ProductDetail() {
   const hasVariants = product?.variantTypes && product.variantTypes.length > 0
 
   useEffect(() => {
+    if (!productId) return
+    fetch(`/api/products/${productId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then((apiProduct) => {
+        if (!apiProduct) return
+        const local: any = {
+          id: apiProduct.id,
+          name_id: apiProduct.nameId,
+          name_en: apiProduct.nameEn,
+          category: apiProduct.category || '',
+          brand: apiProduct.brand || '',
+          specifications: (() => { try { return JSON.parse(apiProduct.specifications || '[]') } catch { return [] } })(),
+          price_idr: apiProduct.priceIdr,
+          original_price_idr: apiProduct.originalPriceIdr || 0,
+          in_stock: apiProduct.inStock,
+          sold_count: apiProduct.soldCount,
+          rating: apiProduct.rating,
+          location: apiProduct.location || '',
+          image: apiProduct.image || '',
+          images: (() => { try { return JSON.parse(apiProduct.images || '[]') } catch { return [] } })(),
+          weight: apiProduct.weight,
+          stock_qty: apiProduct.stockQty,
+          description_id: apiProduct.descriptionId || '',
+          description_en: apiProduct.descriptionEn || '',
+          key_features: (() => { try { return JSON.parse(apiProduct.keyFeatures || '[]') } catch { return [] } })(),
+          features: (() => { try { return JSON.parse(apiProduct.features || '[]') } catch { return [] } })(),
+          variantTypes: apiProduct.variantTypes || [],
+          variants: (apiProduct.productVariants || []).map((v: any) => ({
+            id: v.id,
+            sku: v.sku || '',
+            combination: typeof v.combination === 'string' ? JSON.parse(v.combination) : (v.combination || {}),
+            price_idr: v.priceIdr ?? v.price_idr ?? 0,
+            original_price_idr: v.originalPriceIdr ?? v.original_price_idr,
+            stock_qty: v.stockQty ?? v.stock_qty ?? 0,
+            weight: v.weight ?? 0,
+            image: v.image || '',
+          })),
+          wishlistCount: apiProduct.wishlistCount || 0,
+          shippingEstimateDays: { min: apiProduct.shippingEstimateMin || 2, max: apiProduct.shippingEstimateMax || 5 },
+          sizeChart: apiProduct.sizeChartEntries || [],
+        }
+        updateProduct(productId, local)
+      })
+      .catch(() => {})
+  }, [productId])
+
+  useEffect(() => {
     if (productId) {
+      setReviewsLoading(true)
       fetch(`/api/products/${productId}/reviews`)
         .then(r => r.json())
-        .then(setReviews)
+        .then((data) => {
+          setReviews(data)
+          if (data.length > 0) {
+            const avg = Math.round(data.reduce((s: number, r: any) => s + r.rating, 0) / data.length * 10) / 10
+            updateProduct(productId, { rating: avg })
+          }
+        })
         .catch(() => {})
+        .finally(() => setReviewsLoading(false))
     }
   }, [productId])
 
+  const handleReviewImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    const remaining = 3 - reviewImages.length
+    const toProcess = files.slice(0, remaining)
+
+    Promise.all(toProcess.map(f => new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(f)
+    }))).then(results => {
+      setReviewImages(prev => [...prev, ...results].slice(0, 3))
+    }).catch(() => {})
+
+    e.target.value = ''
+  }
+
+  const removeReviewImage = (index: number) => {
+    setReviewImages(prev => prev.filter((_, i) => i !== index))
+  }
+
   const submitReview = async () => {
-    setReviewLoading(true)
+    setReviewSubmitting(true)
+    setReviewError('')
     try {
       const res = await fetch(`/api/products/${productId}/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewForm),
+        body: JSON.stringify({ ...reviewForm, images: reviewImages }),
       })
       if (res.ok) {
         setReviewSubmitted(true)
         setReviewForm({ rating: 5, text: '' })
+        setReviewImages([])
+        setReviewError('')
         const updated = await fetch(`/api/products/${productId}/reviews`).then(r => r.json())
         setReviews(updated)
+        const avgRating = updated.length > 0
+          ? Math.round(updated.reduce((s: number, r: any) => s + r.rating, 0) / updated.length * 10) / 10
+          : 0
+        updateProduct(productId!, { rating: avgRating })
+      } else {
+        const data = await res.json()
+        setReviewError(data.error || 'Gagal mengirim ulasan')
       }
+    } catch {
+      setReviewError('Terjadi kesalahan, coba lagi')
     } finally {
-      setReviewLoading(false)
+      setReviewSubmitting(false)
     }
   }
 
@@ -357,18 +448,18 @@ export default function ProductDetail() {
               <QuantitySelector
                 value={qty}
                 onChange={setQty}
-                max={currentStock || 99}
+                max={currentStock > 0 ? currentStock : 1}
               />
             </div>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleAddToCart}
-                disabled={hasVariants && !allVariantsSelected}
+                disabled={!currentStock || (hasVariants && !allVariantsSelected)}
                 className={`flex-1 py-3.5 px-6 rounded-xl text-sm font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-2 ${
                   added
                     ? 'bg-emerald-500 text-white'
-                    : hasVariants && !allVariantsSelected
+                    : !currentStock || (hasVariants && !allVariantsSelected)
                       ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                       : 'bg-brand-primary text-white hover:bg-sky-600 shadow-lg shadow-sky-500/20'
                 }`}
@@ -391,9 +482,9 @@ export default function ProductDetail() {
               </button>
               <button
                 onClick={handleBuyNow}
-                disabled={hasVariants && !allVariantsSelected}
+                disabled={!currentStock || (hasVariants && !allVariantsSelected)}
                 className={`flex-1 py-3.5 px-6 rounded-xl text-sm font-bold border-2 transition-all active:scale-[0.98] ${
-                  hasVariants && !allVariantsSelected
+                  !currentStock || (hasVariants && !allVariantsSelected)
                     ? 'border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50'
                     : 'border-brand-primary text-brand-primary hover:bg-sky-50'
                 }`}
@@ -470,25 +561,61 @@ export default function ProductDetail() {
             </h2>
 
             <div className="space-y-4 mb-6">
-              {reviews.length === 0 ? (
+              {reviewsLoading ? (
+                <div className="bg-slate-50 rounded-xl border border-slate-100 p-6 text-center">
+                  <p className="text-slate-400 text-sm">{lang === 'id' ? 'Memuat...' : 'Loading...'}</p>
+                </div>
+              ) : reviews.length === 0 ? (
                 <div className="bg-slate-50 rounded-xl border border-slate-100 p-6 text-center">
                   <p className="text-slate-400 text-sm">{lang === 'id' ? 'Belum ada ulasan' : 'No reviews yet'}</p>
                 </div>
               ) : (
-                reviews.map(r => (
-                  <div key={r.id} className="bg-white rounded-xl border border-slate-100 p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <StarRating rating={r.rating} size={14} />
-                      <span className="text-[11px] text-slate-400">{new Date(r.createdAt).toLocaleDateString('id-ID')}</span>
-                    </div>
-                    {r.user?.name && <p className="text-[11px] font-semibold text-slate-600 mb-1">{r.user.name}</p>}
-                    {r.text && <p className="text-[13px] text-slate-700">{r.text}</p>}
-                  </div>
-                ))
+                  reviews.map(r => {
+                    const imgs = (() => { try { return JSON.parse(r.images || '[]') } catch { return [] } })()
+                    return (
+                      <div key={r.id} className="bg-white rounded-xl border border-slate-100 p-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <StarRating rating={r.rating} size={14} />
+                          <span className="text-[11px] text-slate-400">{new Date(r.createdAt).toLocaleDateString('id-ID')}</span>
+                        </div>
+                        {r.user?.name && <p className="text-[11px] font-semibold text-slate-600 mb-1">{r.user.name}</p>}
+                        {r.text && <p className="text-[13px] text-slate-700">{r.text}</p>}
+                        {imgs.length > 0 && (
+                          <div className="flex gap-2 mt-2 flex-wrap">
+                            {imgs.map((img: string, i: number) => (
+                              <img key={i} src={img} alt="" className="w-16 h-16 rounded-lg object-cover border border-slate-100" />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })
               )}
             </div>
 
-            {!reviewSubmitted ? (
+            {reviewError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-[12px] text-red-600 font-medium">{reviewError}</p>
+              </div>
+            )}
+
+            {reviewSubmitted ? (
+              <p className="text-emerald-600 text-[13px] font-semibold">
+                ✅ {lang === 'id' ? 'Ulasan terkirim!' : 'Review submitted!'}
+              </p>
+            ) : !user ? (
+              <div className="bg-slate-50 rounded-xl border border-slate-100 p-5 text-center">
+                <p className="text-[12px] text-slate-500">
+                  {lang === 'id' ? 'Silakan login untuk memberi ulasan' : 'Please log in to write a review'}
+                </p>
+              </div>
+            ) : reviews.some(r => r.user?.id === user.id) ? (
+              <div className="bg-slate-50 rounded-xl border border-slate-100 p-5 text-center">
+                <p className="text-[12px] text-slate-500">
+                  {lang === 'id' ? 'Kamu sudah memberi ulasan produk ini' : 'You already reviewed this product'}
+                </p>
+              </div>
+            ) : (
               <div className="bg-slate-50 rounded-xl border border-slate-100 p-5">
                 <h3 className="text-[13px] font-bold text-slate-900 mb-3">{lang === 'id' ? 'Tulis Ulasan' : 'Write a Review'}</h3>
                 <div className="flex items-center gap-1 mb-3">
@@ -502,15 +629,38 @@ export default function ProductDetail() {
                 <textarea value={reviewForm.text} onChange={e => setReviewForm({...reviewForm, text: e.target.value})}
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12px] focus:outline-none focus:ring-2 focus:ring-brand-primary/30 resize-none mb-3" rows={3}
                   placeholder={lang === 'id' ? 'Bagikan pengalamanmu...' : 'Share your experience...'} />
-                <button onClick={submitReview} disabled={reviewLoading}
+
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <label className="cursor-pointer px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[11px] font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+                    📷 {lang === 'id' ? 'Tambah Foto' : 'Add Photo'}
+                    <input type="file" accept="image/*" multiple onChange={handleReviewImages} className="hidden" />
+                  </label>
+                  {reviewImages.length > 0 && (
+                    <span className="text-[10px] text-slate-400">
+                      {reviewImages.length}/3
+                    </span>
+                  )}
+                </div>
+
+                {reviewImages.length > 0 && (
+                  <div className="flex gap-2 mb-3 flex-wrap">
+                    {reviewImages.map((img, i) => (
+                      <div key={i} className="relative group">
+                        <img src={img} alt="" className="w-14 h-14 rounded-lg object-cover border border-slate-200" />
+                        <button onClick={() => removeReviewImage(i)}
+                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white rounded-full text-[9px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button onClick={submitReview} disabled={reviewSubmitting}
                   className="px-5 py-2 bg-brand-primary text-white text-[12px] font-bold rounded-lg hover:bg-sky-600 disabled:opacity-50">
-                  {reviewLoading ? (lang === 'id' ? 'Mengirim...' : 'Sending...') : (lang === 'id' ? 'Kirim Ulasan' : 'Submit Review')}
+                  {reviewSubmitting ? (lang === 'id' ? 'Mengirim...' : 'Sending...') : (lang === 'id' ? 'Kirim Ulasan' : 'Submit Review')}
                 </button>
               </div>
-            ) : (
-              <p className="text-emerald-600 text-[13px] font-semibold">
-                ✅ {lang === 'id' ? 'Ulasan terkirim!' : 'Review submitted!'}
-              </p>
             )}
           </div>
         </div>

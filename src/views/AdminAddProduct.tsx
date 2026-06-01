@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
@@ -34,13 +34,27 @@ export default function AdminAddProduct() {
   const [variants, setVariants] = useState<ProductVariant[]>([])
   const [features, setFeatures] = useState<ProductFeature[]>([])
   const [success, setSuccess] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [showVariants, setShowVariants] = useState(false)
 
   const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm({ ...form, [field]: e.target.value })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (variantTypes.length === 0 || variants.length === 0) return
+    const prices = variants.map(v => v.price_idr).filter(Boolean)
+    if (prices.length > 0) {
+      const minPrice = Math.min(...prices)
+      setForm(prev => ({ ...prev, price_idr: String(minPrice) }))
+    }
+    const totalStock = variants.reduce((s, v) => s + (v.stock_qty || 0), 0)
+    setForm(prev => ({ ...prev, stock_qty: String(totalStock) }))
+  }, [variantTypes, variants])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
     const id = nextId()
     const specs = form.specifications
       ? form.specifications.split('\n').filter(Boolean).map(s => s.trim())
@@ -50,7 +64,15 @@ export default function AdminAddProduct() {
       ? form.images
       : ['https://images.pexels.com/photos/4822237/pexels-photo-4822237.jpeg']
 
-    addProduct({
+    const hasVariants = variantTypes.length > 0
+    const computedStock = hasVariants
+      ? variants.reduce((sum, v) => sum + (v.stock_qty || 0), 0)
+      : Number(form.stock_qty) || 0
+    const computedInStock = hasVariants
+      ? variants.some(v => (v.stock_qty || 0) > 0)
+      : computedStock > 0
+
+    const productData = {
       id,
       name_id: form.name_id,
       name_en: form.name_en || form.name_id,
@@ -59,9 +81,9 @@ export default function AdminAddProduct() {
       specifications: specs,
       price_idr: Number(form.price_idr),
       original_price_idr: Number(form.original_price_idr) || Number(form.price_idr),
-      stock_qty: Number(form.stock_qty) || 0,
+      stock_qty: computedStock,
       weight: Number(form.weight) || 0,
-      in_stock: Number(form.stock_qty) > 0,
+      in_stock: computedInStock,
       sold_count: 0,
       rating: 0,
       location: 'Palembang',
@@ -79,11 +101,24 @@ export default function AdminAddProduct() {
         max: Number(form.shippingEstimateMax) || 7,
       },
       sizeChart: [],
-    })
+    }
+
+    addProduct(productData)
+
+    try {
+      await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData),
+      })
+    } catch (err) {
+      console.error('Failed to sync product to DB:', err)
+    }
 
     setSuccess(true)
     setTimeout(() => {
       setSuccess(false)
+      setSubmitting(false)
       router.push('/admin')
     }, 1500)
   }
@@ -121,16 +156,21 @@ export default function AdminAddProduct() {
                 </select>
               </div>
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('admin_form_price', lang)} (Rp) *</label>
-                <input type="number" value={form.price_idr} onChange={update('price_idr')} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30" required min={0} />
+                <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('admin_form_price', lang)} (Rp){variantTypes.length === 0 ? ' *' : ''}</label>
+                <input type="number" value={form.price_idr} onChange={update('price_idr')} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30" required={variantTypes.length === 0} min={0} />
               </div>
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('admin_form_original_price', lang)} (Rp)</label>
+                <label className="block text-[12px] font-semibold text-slate-700 mb-1">
+                  {t('admin_form_original_price', lang)} (Rp)
+                  <span className="ml-1.5 text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
+                    {lang === 'id' ? 'diskon' : 'discount'}
+                  </span>
+                </label>
                 <input type="number" value={form.original_price_idr} onChange={update('original_price_idr')} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30" min={0} />
               </div>
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('admin_form_stock', lang)} *</label>
-                <input type="number" value={form.stock_qty} onChange={update('stock_qty')} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30" required min={0} />
+                <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('admin_form_stock', lang)}{variantTypes.length === 0 ? ' *' : ''}</label>
+                <input type="number" value={form.stock_qty} onChange={update('stock_qty')} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30" required={variantTypes.length === 0} />
               </div>
               <div>
                 <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('admin_form_weight', lang)} (g)</label>
@@ -203,8 +243,8 @@ export default function AdminAddProduct() {
               <Link href="/admin" className="px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-all">
                 {t('admin_cancel', lang)}
               </Link>
-              <button type="submit" className="px-8 py-3 bg-brand-primary text-white text-sm font-bold rounded-xl hover:bg-sky-600 transition-all shadow-lg shadow-sky-500/20">
-                {t('admin_save', lang)}
+              <button type="submit" disabled={submitting} className={`px-8 py-3 text-sm font-bold rounded-xl transition-all shadow-lg shadow-sky-500/20 ${submitting ? 'bg-sky-300 cursor-not-allowed' : 'bg-brand-primary text-white hover:bg-sky-600'}`}>
+                {submitting ? (lang === 'id' ? 'Menyimpan...' : 'Saving...') : t('admin_save', lang)}
               </button>
             </div>
           </form>

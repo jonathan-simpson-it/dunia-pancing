@@ -6,3 +6,7 @@ test-results/
 .env.local
 
 /generated/prisma
+.DS_Store
+*.db
+*.tsbuildinfo
+.playwright-mcp/
