@@ -21,6 +21,10 @@ function ProductCard({ product }: ProductCardProps) {
   const { lang } = useLang()
   const name = lang === 'id' ? product.name_id : product.name_en
   const discount = discountPercent(product.original_price_idr, product.price_idr)
+  const hasVariantStock = product.variants && product.variants.length > 0
+    ? product.variants.some(v => v.stock_qty > 0)
+    : null
+  const isInStock = hasVariantStock !== null ? hasVariantStock : product.in_stock
 
   const images = product.images && product.images.length > 0
     ? product.images
@@ -102,7 +106,7 @@ function ProductCard({ product }: ProductCardProps) {
           </span>
         )}
 
-        {!product.in_stock && (
+        {!isInStock && (
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10">
             <span className="bg-white text-slate-900 px-2.5 py-1 rounded text-[9px] font-bold uppercase tracking-wider shadow">
               {t('product_stock_empty', lang)}

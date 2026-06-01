@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-**Dunia Pancing** is a Next.js 15 App Router e-commerce application for a fishing tackle store in Palembang, Indonesia. Features client-side state (`localStorage`) for products/cart bridged with Server-Side Next.js APIs (e.g., KiriminAja shipping). Built with React 19, TypeScript, and Tailwind CSS 4.
+**Dunia Pancing** is a fullstack Next.js 15 App Router e-commerce application for a fishing tackle store in Palembang, Indonesia. Features a hybrid architecture blending client-side React Components with Prisma-backed server-side databases (SQLite for Dev, Supabase Postgres for Prod). Next.js API Routes power endpoints for KiriminAja shipping, product queries, user addresses, auth, and real-time chat. Built with React 19, TypeScript, and Tailwind CSS 4.
 
 ### Tech Stack
 
@@ -10,10 +10,12 @@
 - React 19, React DOM 19
 - TypeScript
 - Tailwind CSS 4 + PostCSS
+- Prisma ORM 7
+- NextAuth.js v5
 - jsbarcode 3 (SVG barcodes)
 - xlsx 0.18 (Excel import/export)
 - Playwright (E2E testing)
-- Next.js API Routes (KiriminAja logistics integration)
+- Next.js API Routes (KiriminAja logistics, products, chat, addresses)
 
 ### Config
 
@@ -34,11 +36,11 @@ Root Next.js layout. Provides HTML structure containing Google Fonts, metadata, 
 
 ```tsx
 LanguageProvider (i18n id/en)
-  AuthProvider (auth + user mgmt)
-    ProductStoreProvider (product & category CRUD)
-      CartProvider (cart state)
+  AuthProvider (NextAuth + User Mgmt via API)
+    ProductStoreProvider (Product API bridging + LocalStorage fallback)
+      CartProvider (Cart state via local storage)
         SearchContext
-          ChatContext
+          ChatContext (Conversations synced via /api/chat)
 ```
 
 ### App Router Routes (`app/`)
@@ -126,7 +128,19 @@ LanguageProvider (i18n id/en)
 
 ---
 
-## 6. localStorage Keys
+## 6. Prisma Database Models
+
+The app moved away from purely `localStorage` to a fully functioning Prisma ORM.
+
+- **`User`**: Linked with NextAuth. Stores profile data, phone number, and assigns roles (`customer` | `admin`).
+- **`Order` & `OrderItem`**: Stores generated invoices, checkout notes, and links multiple OrderItems.
+- **`UserAddress`**: Supports multiple saved addresses per customer, simplifying repeat checkouts.
+- **`Review` & `ReviewImage`**: Allows customers to leave standard 1-5 star ratings with user images.
+- **`Conversation` & `ChatMessage`**: Powers the real-time help desk, differentiating between `agent` and `customer` strings.
+
+---
+
+## 7. localStorage Keys (Legacy / Active)
 
 | Key                           | Content                             |
 | ----------------------------- | ----------------------------------- |

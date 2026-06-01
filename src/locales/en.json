@@ -72,6 +72,8 @@
   "checkout_address": "Full Address",
   "checkout_city": "City",
   "checkout_notes": "Notes",
+  "checkout_email": "Email (for notifications)",
+  "checkout_kecamatan": "District",
   "checkout_continue": "Continue",
   "checkout_back": "Back",
   "checkout_place_order": "Confirm Order",

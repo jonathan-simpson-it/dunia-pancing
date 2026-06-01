@@ -13,7 +13,7 @@ const COURIER_LOGOS: Record<string, string> = {
 function generateAwbHtml(order: Order, pageBreak: boolean = false): string {
   const courierLabel = order.logistics?.courierLabel || order.shipping.label
   const trackingNumber = order.logistics?.trackingNumber || '-'
-  const barcodeUrl = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&translate-esc=true&dpi=203&imagetype=png&dpi=203`
+  const barcodeUrl = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&translate-esc=true&dpi=300&imagetype=png`
 
   return `
 <div class="awb-page${pageBreak ? ' page-break' : ''}">

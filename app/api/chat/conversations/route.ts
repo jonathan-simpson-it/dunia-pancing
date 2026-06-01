@@ -25,7 +25,7 @@ export async function GET() {
   })
 
   return NextResponse.json(
-    conversations.map(c => ({
+    conversations.map((c: any) => ({
       id: c.id,
       sessionId: c.sessionId,
       customerName: c.customerName,

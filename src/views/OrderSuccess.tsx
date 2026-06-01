@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import InvoicePrint from '../components/ui/InvoicePrint'
 import Barcode from '../components/ui/Barcode'
-import { getOrder, buildWhatsAppMessage } from '../utils/order'
+import { getOrder, buildWhatsAppMessage, PAYMENT_METHODS } from '../utils/order'
 import type { Order } from '../types'
 import id from '../locales/id.json'
 import en from '../locales/en.json'
@@ -40,13 +40,20 @@ function mapDbOrderToLocal(dbo: any): Order {
       label: dbo.shippingLabel || '',
       fee: dbo.shippingFee ?? 0,
     },
-    payment: {
-      id: '',
-      label: dbo.paymentMethod || '',
-      method: dbo.paymentType || '',
-      bank: dbo.paymentBank || '',
-      accountNumber: '',
-    },
+    payment: (() => {
+      const pmt = dbo.paymentMethod || ''
+      const ptype = dbo.paymentType || ''
+      const pbank = dbo.paymentBank || ''
+      const matched = PAYMENT_METHODS.find(p => p.type === ptype && (pbank ? p.bank === pbank : p.label_id === pmt))
+      return {
+        id: matched?.id || '',
+        label: pmt,
+        method: ptype,
+        type: ptype,
+        bank: pbank,
+        accountNumber: matched?.accountNumber || '',
+      }
+    })(),
     subtotal: dbo.subtotal ?? 0,
     shipping_fee: dbo.shippingFee ?? 0,
     total: dbo.total ?? 0,
@@ -64,25 +71,28 @@ export default function OrderSuccess() {
   const { lang } = useLang()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
+  const [processingAction, setProcessingAction] = useState<string | null>(null)
+  const testingMode = process.env.NEXT_PUBLIC_TESTING_MODE === 'true'
 
   useEffect(() => {
     if (!orderId) return
-    const local = getOrder(orderId)
-    if (local) {
-      setOrder(local)
-      setLoading(false)
-      return
-    }
-    fetch(`/api/orders?pageSize=1`, { cache: 'no-store' })
-      .then(r => r.json())
-      .then(data => {
-        const found = data.orders?.find((o: any) => o.id === orderId || o.orderNumber === orderId)
-        if (found) {
-          setOrder(mapDbOrderToLocal(found))
-        }
+    getOrder(orderId).then(local => {
+      if (local) {
+        setOrder(local)
         setLoading(false)
-      })
-      .catch(() => setLoading(false))
+        return
+      }
+      fetch(`/api/orders?pageSize=1`, { cache: 'no-store' })
+        .then(r => r.json())
+        .then(data => {
+          const found = data.orders?.find((o: any) => o.id === orderId || o.orderNumber === orderId)
+          if (found) {
+            setOrder(mapDbOrderToLocal(found))
+          }
+          setLoading(false)
+        })
+        .catch(() => setLoading(false))
+    })
   }, [orderId])
 
   if (loading) return null
@@ -112,6 +122,32 @@ export default function OrderSuccess() {
     )
   }
 
+  const handleMarkPaid = async () => {
+    setProcessingAction('paid')
+    try {
+      const res = await fetch(`/api/testing/orders/${order.id}/mark-paid`, {
+        method: 'PUT',
+      })
+      if (res.ok) {
+        setOrder(prev => prev ? { ...prev, status: 'paid' } : prev)
+      }
+    } catch {}
+    setProcessingAction(null)
+  }
+
+  const handleMarkCompleted = async () => {
+    setProcessingAction('completed')
+    try {
+      const res = await fetch(`/api/testing/orders/${order.id}/mark-completed`, {
+        method: 'PUT',
+      })
+      if (res.ok) {
+        setOrder(prev => prev ? { ...prev, status: 'completed' } : prev)
+      }
+    } catch {}
+    setProcessingAction(null)
+  }
+
   const waMsg = buildWhatsAppMessage(order, lang)
 
   const handleWA = () => {
@@ -127,6 +163,27 @@ export default function OrderSuccess() {
       : `Order ID: ${order.id}\nTotal: Rp${order.total.toLocaleString('id-ID')}`
     navigator.clipboard.writeText(info)
   }
+
+  const statusLabels: Record<string, [string, string]> = {
+    waiting_payment: ['Menunggu Pembayaran', 'Waiting for Payment'],
+    paid: ['Dibayar', 'Paid'],
+    to_ship: ['Dikirim', 'To Ship'],
+    shipping: ['Dikirim', 'Shipping'],
+    completed: ['Selesai', 'Completed'],
+    cancelled: ['Dibatalkan', 'Cancelled'],
+  }
+
+  const statusColors: Record<string, string> = {
+    waiting_payment: 'bg-yellow-100 text-yellow-800',
+    paid: 'bg-blue-100 text-blue-700',
+    to_ship: 'bg-orange-100 text-orange-700',
+    shipping: 'bg-purple-100 text-purple-700',
+    completed: 'bg-emerald-100 text-emerald-700',
+    cancelled: 'bg-red-100 text-red-700',
+  }
+
+  const currentStatus = statusLabels[order.status] || [order.status, order.status]
+  const currentColor = statusColors[order.status] || 'bg-slate-100 text-slate-700'
 
   const isBankTransfer = order.payment.type === 'bank_transfer'
   const isWalkinPayment = order.payment.type === 'pay_store' || order.payment.type === 'cod'
@@ -146,14 +203,72 @@ export default function OrderSuccess() {
           <div className="inline-flex flex-col items-center gap-2 px-6 py-4 bg-slate-50 rounded-xl border border-slate-100">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('order_success_number', lang)}</span>
             <span className="text-lg font-bold font-mono text-slate-900 tracking-wider">{order.id}</span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-800 text-[11px] font-bold rounded-full">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {t('order_success_status', lang)}
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-full ${currentColor}`}>
+              {order.status === 'waiting_payment' && (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              {order.status === 'paid' && (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              {order.status === 'cancelled' && (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
+              {order.status === 'shipping' || order.status === 'to_ship' ? (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                </svg>
+              ) : null}
+              {order.status === 'completed' && (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              {lang === 'id' ? currentStatus[0] : currentStatus[1]}
             </span>
           </div>
         </div>
+
+        {(testingMode && (order.status === 'waiting_payment' || order.status === 'shipping')) && (
+          <div className="bg-white rounded-2xl border-2 border-orange-200 p-6 mb-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm">🧪</span>
+              <h3 className="text-sm font-bold text-orange-700">Testing Mode</h3>
+            </div>
+            <p className="text-[12px] text-orange-600 mb-4">
+              {order.status === 'waiting_payment'
+                ? (lang === 'id' ? 'Tandai pesanan sebagai dibayar' : 'Mark order as paid')
+                : (lang === 'id' ? 'Tandai pesanan sebagai sudah sampai' : 'Mark order as arrived')}
+            </p>
+            {order.status === 'waiting_payment' && (
+              <button
+                onClick={handleMarkPaid}
+                disabled={processingAction !== null}
+                className="w-full py-3 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition-all disabled:opacity-50"
+              >
+                {processingAction === 'paid'
+                  ? (lang === 'id' ? 'Memproses...' : 'Processing...')
+                  : (lang === 'id' ? 'Tandai Dibayar' : 'Mark as Paid')}
+              </button>
+            )}
+            {order.status === 'shipping' && (
+              <button
+                onClick={handleMarkCompleted}
+                disabled={processingAction !== null}
+                className="w-full py-3 bg-emerald-500 text-white text-sm font-bold rounded-xl hover:bg-emerald-600 transition-all disabled:opacity-50"
+              >
+                {processingAction === 'completed'
+                  ? (lang === 'id' ? 'Memproses...' : 'Processing...')
+                  : (lang === 'id' ? 'Tandai Sampai' : 'Mark as Arrived')}
+              </button>
+            )}
+          </div>
+        )}
 
         {isBankTransfer && (
           <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6 shadow-sm">

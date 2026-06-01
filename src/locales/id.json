@@ -72,6 +72,8 @@
   "checkout_address": "Alamat Lengkap",
   "checkout_city": "Kota",
   "checkout_notes": "Catatan",
+  "checkout_email": "Email (untuk notifikasi)",
+  "checkout_kecamatan": "Kecamatan",
   "checkout_continue": "Lanjutkan",
   "checkout_back": "Kembali",
   "checkout_place_order": "Konfirmasi Pesanan",

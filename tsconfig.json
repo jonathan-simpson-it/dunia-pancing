@@ -17,7 +17,6 @@
       "DOM.Iterable"
     ],
     "types": [],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"

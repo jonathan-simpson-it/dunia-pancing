@@ -25,6 +25,7 @@ async function main() {
   })
 
   const hashedPassword = await bcrypt.hash('admin123', 12)
+  const clientHashedPassword = await bcrypt.hash('client123', 12)
 
   await prisma.user.create({
     data: {
@@ -33,6 +34,17 @@ async function main() {
       name: 'Admin Toko',
       role: 'admin',
       phone: '081234567890',
+      shopId: shop.id,
+    },
+  })
+
+  await prisma.user.create({
+    data: {
+      username: 'client',
+      password: clientHashedPassword,
+      name: 'Client User',
+      role: 'client',
+      phone: '081234567891',
       shopId: shop.id,
     },
   })

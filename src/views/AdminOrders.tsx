@@ -71,6 +71,11 @@ export default function AdminOrders() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [refreshKey, setRefreshKey] = useState(0)
 
+  const [orders, setOrders] = useState<Order[]>([])
+  const [total, setTotal] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({ all: 0 })
+
   const [detailOrder, setDetailOrder] = useState<Order | null>(null)
   const [shipModal, setShipModal] = useState<{ orders: Order[] } | null>(null)
   const [cancelModal, setCancelModal] = useState<{ orderId: string } | null>(null)
@@ -93,6 +98,21 @@ export default function AdminOrders() {
     setTimeout(() => setToast(null), 3000)
   }
 
+  useEffect(() => {
+    const load = async () => {
+      const status = activeTab === 'all' ? null : activeTab
+      const [result, counts] = await Promise.all([
+        loadPaginatedOrders(page, pageSize, status, search, sortField, sortDir),
+        getStatusCounts(),
+      ])
+      setOrders(result.orders)
+      setTotal(result.total)
+      setTotalPages(result.totalPages)
+      setStatusCounts(counts)
+    }
+    load()
+  }, [page, pageSize, activeTab, search, sortField, sortDir, refreshKey])
+
   const debouncedSearch = useCallback((value: string) => {
     setSearchInput(value)
     if (searchRef.current) clearTimeout(searchRef.current)
@@ -102,13 +122,6 @@ export default function AdminOrders() {
       setSelectedIds(new Set())
     }, 350)
   }, [])
-
-  const { orders, total, totalPages } = useMemo(() => {
-    const status = activeTab === 'all' ? null : activeTab
-    return loadPaginatedOrders(page, pageSize, status, search, sortField, sortDir)
-  }, [page, pageSize, activeTab, search, sortField, sortDir, refreshKey])
-
-  const statusCounts = useMemo(() => getStatusCounts(), [refreshKey])
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -129,30 +142,36 @@ export default function AdminOrders() {
 
   const refresh = () => setRefreshKey(k => k + 1)
 
-  const handleConfirmPayment = (orderId: string) => {
-    updateOrderStatus(orderId, 'paid')
+  const handleConfirmPayment = async (orderId: string) => {
+    setProcessing(true)
+    await updateOrderStatus(orderId, 'paid')
     showToast(lang === 'id' ? 'Pembayaran dikonfirmasi' : 'Payment confirmed', 'success')
     setSelectedIds(new Set())
+    setProcessing(false)
     refresh()
   }
 
-  const handleConfirmToShip = (orderId: string) => {
-    updateOrderStatus(orderId, 'to_ship')
+  const handleConfirmToShip = async (orderId: string) => {
+    setProcessing(true)
+    await updateOrderStatus(orderId, 'to_ship')
     showToast(lang === 'id' ? 'Pesanan siap dikirim' : 'Order ready to ship', 'success')
     setSelectedIds(new Set())
+    setProcessing(false)
     refresh()
   }
 
-  const handleMarkCompleted = (orderId: string) => {
-    updateOrderStatus(orderId, 'completed')
+  const handleMarkCompleted = async (orderId: string) => {
+    setProcessing(true)
+    await updateOrderStatus(orderId, 'completed')
     showToast(lang === 'id' ? 'Pesanan selesai' : 'Order completed', 'success')
+    setProcessing(false)
     refresh()
   }
 
-  const handleBulkMarkPaid = () => {
+  const handleBulkMarkPaid = async () => {
     if (selectedIds.size === 0) return
     setProcessing(true)
-    bulkUpdateOrderStatus(Array.from(selectedIds), 'paid')
+    await bulkUpdateOrderStatus(Array.from(selectedIds), 'paid')
     showToast(
       lang === 'id'
         ? `${selectedIds.size} pembayaran dikonfirmasi`
@@ -164,10 +183,10 @@ export default function AdminOrders() {
     refresh()
   }
 
-  const handleBulkComplete = () => {
+  const handleBulkComplete = async () => {
     if (selectedIds.size === 0) return
     setProcessing(true)
-    bulkUpdateOrderStatus(Array.from(selectedIds), 'completed')
+    await bulkUpdateOrderStatus(Array.from(selectedIds), 'completed')
     showToast(
       lang === 'id'
         ? `${selectedIds.size} pesanan selesai`
@@ -180,10 +199,10 @@ export default function AdminOrders() {
     refresh()
   }
 
-  const handleBulkShip = () => {
+  const handleBulkShip = async () => {
     if (selectedIds.size === 0) return
     const ids = Array.from(selectedIds)
-    const allOrders = loadOrders()
+    const allOrders = await loadOrders()
     const selectedOrders = allOrders.filter(o => ids.includes(o.id))
     setBulkAction(null)
     setShipModal({ orders: selectedOrders })
@@ -209,6 +228,9 @@ export default function AdminOrders() {
         for (const order of orders) {
           try {
             const totalWeight = order.items.reduce((s, i) => s + (i.qty * 500), 200)
+            const isCOD = order.payment.type === 'cod'
+            const destKecamatanId = order.customer.kecamatanId || 0
+            const serviceType = (order.shipping as any).serviceType || 'REG'
             const resp = await kiriminajaCreateOrder({
               address: STORE_ADDRESS,
               phone: STORE_PHONE,
@@ -219,7 +241,7 @@ export default function AdminOrders() {
                 destination_name: order.customer.name,
                 destination_phone: order.customer.phone,
                 destination_address: `${order.customer.address}, ${order.customer.city}`,
-                destination_kecamatan_id: 0,
+                destination_kecamatan_id: destKecamatanId,
                 weight: totalWeight,
                 width: DEFAULT_PACKAGE_WIDTH,
                 length: DEFAULT_PACKAGE_LENGTH,
@@ -227,8 +249,8 @@ export default function AdminOrders() {
                 item_value: order.total,
                 shipping_cost: order.shipping_fee,
                 service: courier,
-                service_type: 'REG',
-                cod: 0,
+                service_type: serviceType,
+                cod: isCOD ? order.total : 0,
                 package_type_id: DEFAULT_PACKAGE_TYPE_ID,
                 item_name: order.items.map(i => i.name_id).join(', ').slice(0, 200),
                 drop: pickupType === 'dropoff',
@@ -251,7 +273,7 @@ export default function AdminOrders() {
           trackingNumber: r.trackingNumber,
           pickupType,
         }))
-        const result = bulkAssignResi(successItems)
+        const result = await bulkAssignResi(successItems)
 
         if (failed.length > 0) {
           showToast(
@@ -292,7 +314,7 @@ export default function AdminOrders() {
       pickupType,
     }))
 
-    const result = bulkAssignResi(items)
+    const result = await bulkAssignResi(items)
 
     if (result.failed.length > 0) {
       showToast(
@@ -316,13 +338,14 @@ export default function AdminOrders() {
     refresh()
   }
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     if (!cancelModal) return
     if (!cancelReason.trim()) {
       showToast(lang === 'id' ? 'Alasan pembatalan wajib diisi' : 'Cancellation reason is required', 'error')
       return
     }
-    cancelOrder(cancelModal.orderId, cancelReason)
+    setProcessing(true)
+    await cancelOrder(cancelModal.orderId, cancelReason)
     showToast(lang === 'id' ? 'Pesanan dibatalkan' : 'Order cancelled', 'success')
     setCancelModal(null)
     setCancelReason('')
@@ -341,9 +364,9 @@ export default function AdminOrders() {
     })
   }
 
-  const handleBulkPrintAwb = () => {
+  const handleBulkPrintAwb = async () => {
     if (selectedIds.size === 0) return
-    const allOrders = loadOrders()
+    const allOrders = await loadOrders()
     const toPrint = allOrders.filter(
       o => selectedIds.has(o.id) && o.logistics?.trackingNumber,
     )

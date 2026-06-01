@@ -13,42 +13,45 @@ Codebase Analysis: Dunia Pancing
 - **Testing:** Playwright (E2E tests in `/e2e/`)
 - **Shipping API Integration:** KiriminAja (Indonesian logistics service)
 - **Barcode Printing:** JsBarcode
-- **Data Storage:** Mock/localStorage (no database -- products live in a JSON seed file, orders/cart live in localStorage)
+- **Data Storage:** Prisma ORM with SQLite (development) and PostgreSQL (production). Some legacy features (like cart items) temporarily mirror state in `localStorage` for transition, but core models (Users, Addresses, Chat, Orders) are database-backed.
 - **I18n:** Custom simple locale system (JSON files for `id` and `en`)
 
-## 2. Blog Status: NONE EXISTS
+## 2. Blog Status: ACTIVE
 
-There is **no blog feature** in this project. The codebase has:
+The project integrates a fully functioning blog feature.
 
-- No `/blog` directory or route
-- No `/posts` or `/content` directories
-- No `.md` or `.mdx` files (the only `.md` files are `README.md`, `plan.md`, and `DUNIA_PANCING_CODABASE.md` -- none are blog content)
-- No blog-related configuration, types, or components
-- No references to "blog", "article", "post", or "artikel" in any source file
+- Directory `app/blog/` for static listing
+- Dynamic route `app/blog/[slug]/` for article display
+- Data sourced securely from `src/data/blog.json`
+- Supports per-post SEO optimization with OpenGraph implementations.
 
 ## 3. Current Page Structure (App Router Routes)
 
 All routes live under `/Users/devoob/Downloads/tobedeleted/duniapancing/app/`:
 
-| Route | File | Purpose |
-|---|---|---|
-| `/` | `app/page.tsx` | Home page |
-| `/catalog` | `app/catalog/page.tsx` | Product catalog with search/filter |
-| `/product/[id]` | `app/product/[id]/page.tsx` | Product detail page |
-| `/cart` | `app/cart/page.tsx` | Shopping cart |
-| `/checkout` | `app/checkout/page.tsx` | Checkout flow |
-| `/order-success/[orderId]` | `app/order-success/[orderId]/page.tsx` | Order confirmation |
-| `/contact` | `app/contact/page.tsx` | Contact/store info page |
-| `/login` | `app/login/page.tsx` | Login/register page |
-| `/account` | `app/account/page.tsx` | Customer account page |
-| `/admin` | `app/admin/page.tsx` | Admin dashboard |
-| `/admin/orders` | `app/admin/orders/page.tsx` | Order management |
-| `/admin/add` | `app/admin/add/page.tsx` | Add product form |
-| `/admin/import` | `app/admin/import/page.tsx` | Bulk price import |
-| `/admin/revenue` | `app/admin/revenue/page.tsx` | Revenue report |
-| `/api/kiriminaja/*` | `app/api/kiriminaja/` | API routes for shipping |
-| `/blog` | `app/blog/page.tsx` | Blog listing |
-| `/blog/[slug]` | `app/blog/[slug]/page.tsx` | Individual blog post |
+| Route                      | File                                   | Purpose                            |
+| -------------------------- | -------------------------------------- | ---------------------------------- |
+| `/`                        | `app/page.tsx`                         | Home page                          |
+| `/catalog`                 | `app/catalog/page.tsx`                 | Product catalog with search/filter |
+| `/product/[id]`            | `app/product/[id]/page.tsx`            | Product detail page                |
+| `/cart`                    | `app/cart/page.tsx`                    | Shopping cart                      |
+| `/checkout`                | `app/checkout/page.tsx`                | Checkout flow                      |
+| `/order-success/[orderId]` | `app/order-success/[orderId]/page.tsx` | Order confirmation                 |
+| `/contact`                 | `app/contact/page.tsx`                 | Contact/store info page            |
+| `/login`                   | `app/login/page.tsx`                   | Login/register page                |
+| `/account`                 | `app/account/page.tsx`                 | Customer account page              |
+| `/admin`                   | `app/admin/page.tsx`                   | Admin dashboard                    |
+| `/admin/orders`            | `app/admin/orders/page.tsx`            | Order management                   |
+| `/admin/add`               | `app/admin/add/page.tsx`               | Add product form                   |
+| `/admin/import`            | `app/admin/import/page.tsx`            | Bulk price import                  |
+| `/admin/revenue`           | `app/admin/revenue/page.tsx`           | Revenue report                     |
+| `/api/auth/*`              | `app/api/auth/[...nextauth]/route.ts`  | NextAuth.js endpoints              |
+| `/api/kiriminaja/*`        | `app/api/kiriminaja/`                  | API routes for shipping            |
+| `/api/products`            | `app/api/products/route.ts`            | Product API endpoints              |
+| `/api/user/addresses`      | `app/api/user/addresses/route.ts`      | User Address management API        |
+| `/api/chat`                | `app/api/chat/route.ts`                | API to handle chat interactions    |
+| `/blog`                    | `app/blog/page.tsx`                    | Blog listing                       |
+| `/blog/[slug]`             | `app/blog/[slug]/page.tsx`             | Individual blog post               |
 
 ## 4. Blog Directory Structure
 
@@ -95,22 +98,22 @@ Blog posts follow a JSON-based content model:
 
 ## 8. Relevant Config Files
 
-| File | Path | Relevance |
-|---|---|---|
-| `package.json` | `package.json` | Dependencies, scripts |
-| `next.config.ts` | `next.config.ts` | Next.js configuration (image domains) |
-| `tsconfig.json` | `tsconfig.json` | TypeScript config |
-| `robots.txt` | `public/robots.txt` | Points to `https://duniapancing.my.id/sitemap.xml` |
-| `app/layout.tsx` | `app/layout.tsx` | Root layout with metadata template and OpenGraph |
-| `src/config/env.ts` | `src/config/env.ts` | Store configuration (address, phone, etc.) |
-| `src/types.ts` | `src/types.ts` | All TypeScript interfaces including `BlogPost` |
-| `src/locales/id.json` | `src/locales/id.json` | Indonesian translations (incl. SEO strings) |
-| `src/locales/en.json` | `src/locales/en.json` | English translations (incl. SEO strings) |
-| `src/data/blog.json` | `src/data/blog.json` | Blog post data |
-| `src/data/seed.json` | `src/data/seed.json` | Product seed data |
-| `src/components/layout/Navbar.tsx` | `src/components/layout/Navbar.tsx` | Navigation bar with blog link |
-| `src/components/layout/Footer.tsx` | `src/components/layout/Footer.tsx` | Footer with blog link |
-| `.github/workflows/deploy.yml` | `.github/workflows/deploy.yml` | CI/CD deployment workflow |
+| File                               | Path                               | Relevance                                          |
+| ---------------------------------- | ---------------------------------- | -------------------------------------------------- |
+| `package.json`                     | `package.json`                     | Dependencies, scripts                              |
+| `next.config.ts`                   | `next.config.ts`                   | Next.js configuration (image domains)              |
+| `tsconfig.json`                    | `tsconfig.json`                    | TypeScript config                                  |
+| `robots.txt`                       | `public/robots.txt`                | Points to `https://duniapancing.my.id/sitemap.xml` |
+| `app/layout.tsx`                   | `app/layout.tsx`                   | Root layout with metadata template and OpenGraph   |
+| `src/config/env.ts`                | `src/config/env.ts`                | Store configuration (address, phone, etc.)         |
+| `src/types.ts`                     | `src/types.ts`                     | All TypeScript interfaces including `BlogPost`     |
+| `src/locales/id.json`              | `src/locales/id.json`              | Indonesian translations (incl. SEO strings)        |
+| `src/locales/en.json`              | `src/locales/en.json`              | English translations (incl. SEO strings)           |
+| `src/data/blog.json`               | `src/data/blog.json`               | Blog post data                                     |
+| `src/data/seed.json`               | `src/data/seed.json`               | Product seed data                                  |
+| `src/components/layout/Navbar.tsx` | `src/components/layout/Navbar.tsx` | Navigation bar with blog link                      |
+| `src/components/layout/Footer.tsx` | `src/components/layout/Footer.tsx` | Footer with blog link                              |
+| `.github/workflows/deploy.yml`     | `.github/workflows/deploy.yml`     | CI/CD deployment workflow                          |
 
 ## 9. SEO-Related Content
 

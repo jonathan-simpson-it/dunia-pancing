@@ -8,14 +8,16 @@ export default function ChatWindow() {
   const [input, setInput] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const prevMsgLenRef = useRef(0)
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && messages.length > prevMsgLenRef.current) {
       setTimeout(() => {
         listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
         inputRef.current?.focus()
       }, 100)
     }
+    prevMsgLenRef.current = messages.length
   }, [isOpen, messages.length])
 
   const handleSend = () => {

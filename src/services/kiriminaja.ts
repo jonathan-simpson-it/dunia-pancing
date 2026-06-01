@@ -113,3 +113,21 @@ export async function cancelOrderKiriminAja(
 export async function getCreditBalance(): Promise<{ data: { balance: number } }> {
   return post('/credit')
 }
+
+export async function searchDistrict(
+  search: string,
+): Promise<{ status: boolean; datas: { id: number; kecamatan_name: string; kabupaten_id: number }[] }> {
+  return post('/search-district', { search })
+}
+
+export async function searchSubdistrict(
+  kecamatan_id: number,
+): Promise<{ status: boolean; results: { id: number; kelurahan_name: string; kecamatan_id: number }[] }> {
+  return post('/search-subdistrict', { kecamatan_id })
+}
+
+export async function registerCallback(
+  url: string,
+): Promise<{ status: boolean; text: string }> {
+  return post('/register-callback', { url })
+}

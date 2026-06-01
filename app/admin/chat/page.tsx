@@ -32,7 +32,10 @@ export default function AdminChat() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [reply, setReply] = useState('')
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const prevMsgCountRef = useRef(0)
+  const selectedIdRef = useRef<string | null>(null)
 
   const fetchConversations = async () => {
     const res = await fetch('/api/chat/conversations')
@@ -61,12 +64,28 @@ export default function AdminChat() {
   }, [selectedId])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (selectedId) {
+      prevMsgCountRef.current = 0
+    }
+  }, [selectedId])
+
+  useEffect(() => {
+    if (selectedId && selectedId !== selectedIdRef.current) {
+      selectedIdRef.current = selectedId
+      const el = messagesContainerRef.current
+      if (el) el.scrollTop = el.scrollHeight
+      prevMsgCountRef.current = messages.length
+      return
+    }
+    if (messages.length > prevMsgCountRef.current) {
+      const el = messagesContainerRef.current
+      if (el) el.scrollTop = el.scrollHeight
+    }
+    prevMsgCountRef.current = messages.length
   }, [messages])
 
-  const selectConversation = async (id: string) => {
+  const selectConversation = (id: string) => {
     setSelectedId(id)
-    await fetchMessages(id)
     setConversations(prev =>
       prev.map(c => c.id === id ? { ...c, unread: 0 } : c)
     )
@@ -151,7 +170,7 @@ export default function AdminChat() {
 
       {selectedId ? (
         <div className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.map(m => (
               <div key={m.id} className={`flex ${m.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[75%] rounded-xl px-4 py-2.5 text-[13px] ${

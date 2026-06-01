@@ -1,43 +1,150 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import StepIndicator from '../components/ui/StepIndicator'
 import { formatIDR } from '../utils/formatters'
 import { SHIPPING_METHODS, PAYMENT_METHODS } from '../utils/order'
+import { USE_KIRIMINAJA_API, USE_XENDIT } from '../config/env'
+import { searchDistrict } from '../services/kiriminaja'
 import type { FormErrors } from '../types'
 import id from '../locales/id.json'
 import en from '../locales/en.json'
+
+interface ShippingRate {
+  id: string
+  label_id: string
+  label_en: string
+  fee: number
+  etd_id: string
+  etd_en: string
+  service_type: string
+}
 
 const localeId = id as Record<string, string>
 const localeEn = en as Record<string, string>
 const t = (key: string, lang: 'id' | 'en'): string => lang === 'id' ? localeId[key] : localeEn[key]
 
+function mapKiriminAjaRate(r: any, lang: 'id' | 'en'): ShippingRate {
+  const serviceName = r.service_name || r.service
+  return {
+    id: r.service,
+    label_id: serviceName,
+    label_en: serviceName,
+    fee: parseInt(r.cost),
+    etd_id: r.etd ? `${r.etd} hari` : '-',
+    etd_en: r.etd ? `${r.etd} days` : '-',
+    service_type: r.service_type,
+  }
+}
+
 export default function Checkout() {
   const { lang } = useLang()
   const router = useRouter()
   const { items, subtotal, clearCart } = useCart()
+  const { user, isLoggedIn, loaded } = useAuth()
   const [step, setStep] = useState(0)
   const [customer, setCustomer] = useState({
-    name: '', phone: '', address: '', city: 'Palembang', notes: '',
+    name: isLoggedIn ? user?.name || '' : '',
+    phone: isLoggedIn ? user?.phone || '' : '',
+    address: '', city: 'Palembang', kecamatan: '', notes: '', email: '',
   })
+  const [addresses, setAddresses] = useState<any[]>([])
+  const [selectedAddrId, setSelectedAddrId] = useState<string | null>(null)
+  const [shippingRates, setShippingRates] = useState<ShippingRate[]>(SHIPPING_METHODS.map(s => ({ ...s, service_type: '' })))
   const [shippingId, setShippingId] = useState('jne_reg')
   const [paymentId, setPaymentId] = useState('bca')
   const [errors, setErrors] = useState<FormErrors>({})
   const [placing, setPlacing] = useState(false)
+  const [loadingShipping, setLoadingShipping] = useState(false)
+  const [kecamatanId, setKecamatanId] = useState<number | null>(null)
+  const pricingTimer = useRef<NodeJS.Timeout | null>(null)
   const [voucherCode, setVoucherCode] = useState('')
   const [voucherDiscount, setVoucherDiscount] = useState(0)
   const [voucherError, setVoucherError] = useState('')
   const [voucherApplied, setVoucherApplied] = useState(false)
+
+  useEffect(() => {
+    if (!loaded || !isLoggedIn) return
+    fetch('/api/user/addresses').then(r => r.json()).then((addrs: any[]) => {
+      setAddresses(addrs)
+      const def = addrs.find((a: any) => a.isDefault) || addrs[0]
+      if (def) {
+        setSelectedAddrId(def.id)
+        setCustomer({
+          name: def.name,
+          phone: def.phone,
+          address: def.address,
+          city: def.city,
+          kecamatan: '',
+          notes: '',
+          email: '',
+        })
+      }
+    }).catch(() => {})
+  }, [loaded, isLoggedIn])
+
+  const fetchPricing = useCallback(async (city: string, kecamatan: string) => {
+    if (!city.trim() || !kecamatan.trim()) return
+    setLoadingShipping(true)
+
+    if (USE_KIRIMINAJA_API) {
+      try {
+        const searchRes = await searchDistrict(kecamatan)
+        const districts = searchRes?.datas || []
+        const match = districts.find((d: any) =>
+          d.kecamatan_name?.toLowerCase().includes(kecamatan.toLowerCase()) ||
+          kecamatan.toLowerCase().includes(d.kecamatan_name?.toLowerCase() || ''),
+        )
+        const destId = match?.id || 0
+        setKecamatanId(destId)
+
+        if (destId) {
+          const totalWeight = items.reduce((s, i) => s + (i.qty * 500), 200) + 200
+          const pricingRes = await fetch('/api/kiriminaja/pricing', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              origin: 548,
+              destination: destId,
+              weight: totalWeight,
+              item_value: subtotal,
+            }),
+          })
+
+          if (pricingRes.ok) {
+            const pricingData = await pricingRes.json()
+            const results = pricingData.results || []
+            if (results.length > 0) {
+              const mapped = results.map((r: any) => mapKiriminAjaRate(r, lang))
+              setShippingRates(mapped)
+              if (!mapped.find((r: any) => r.id === shippingId)) {
+                setShippingId(mapped[0].id)
+              }
+              setLoadingShipping(false)
+              return
+            }
+          }
+        }
+      } catch {
+        // fallback to hardcoded pricing
+      }
+    }
+
+    setShippingRates(SHIPPING_METHODS.map(s => ({ ...s, service_type: '' })))
+    setLoadingShipping(false)
+  }, [items, subtotal, lang, shippingId])
 
   const applyVoucher = async () => {
     if (!voucherCode.trim()) return
     const res = await fetch('/api/vouchers/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+
       body: JSON.stringify({ code: voucherCode, subtotal, shopId: 'default' }),
     })
     const data = await res.json()
@@ -55,16 +162,19 @@ export default function Checkout() {
     }
   }
 
-  const steps = [
-    t('checkout_step_customer', lang),
-    t('checkout_step_shipping', lang),
-    t('checkout_step_payment', lang),
-    t('checkout_step_review', lang),
-  ]
+  const hasCustomerStep = !isLoggedIn
+  const steps = hasCustomerStep
+    ? [t('checkout_step_customer', lang), t('checkout_step_shipping', lang), t('checkout_step_payment', lang), t('checkout_step_review', lang)]
+    : [t('checkout_step_shipping', lang), t('checkout_step_payment', lang), t('checkout_step_review', lang)]
 
-  const shipping = SHIPPING_METHODS.find(s => s.id === shippingId)!
+  const STEP_CUSTOMER = hasCustomerStep ? 0 : -1
+  const STEP_SHIPPING = hasCustomerStep ? 1 : 0
+  const STEP_PAYMENT   = hasCustomerStep ? 2 : 1
+  const STEP_REVIEW    = hasCustomerStep ? 3 : 2
+
+  const shipping = shippingRates.find(s => s.id === shippingId) || shippingRates[0] || SHIPPING_METHODS[0]
   const payment = PAYMENT_METHODS.find(p => p.id === paymentId)!
-  const total = subtotal + shipping.fee - voucherDiscount
+  const total = subtotal + (shipping?.fee || 0) - voucherDiscount
 
   const validateCustomer = (): boolean => {
     const errs: FormErrors = {}
@@ -77,7 +187,7 @@ export default function Checkout() {
   }
 
   const handleNext = () => {
-    if (step === 0 && !validateCustomer()) return
+    if (step === STEP_CUSTOMER && !validateCustomer()) return
     if (step < steps.length - 1) {
       setStep(s => s + 1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -91,7 +201,8 @@ export default function Checkout() {
     }
   }
 
-  const isWalkinPayment = payment.type === 'pay_store' || payment.type === 'cod'
+  const skipXendit = payment.type === 'pay_store' || payment.type === 'cod' || payment.type === 'bank_transfer'
+  const useXenditInvoice = payment.type === 'ewallet'
 
   const handlePlaceOrder = async () => {
     setPlacing(true)
@@ -101,6 +212,7 @@ export default function Checkout() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: items.map(i => ({
+            product_id: i.id,
             name_id: i.name_id,
             name_en: i.name_en,
             image: i.image,
@@ -119,10 +231,13 @@ export default function Checkout() {
             city: customer.city,
             notes: customer.notes,
           },
+          kecamatanId,
+          kecamatan: customer.kecamatan,
           shipping: {
             id: shipping.id,
             label: lang === 'id' ? shipping.label_id : shipping.label_en,
             fee: shipping.fee,
+            service_type: (shipping as any).service_type || '',
           },
           payment: {
             id: payment.id,
@@ -137,7 +252,7 @@ export default function Checkout() {
       const order = await res.json()
       clearCart()
 
-      if (!isWalkinPayment) {
+      if (useXenditInvoice) {
         const invRes = await fetch('/api/payments/create-invoice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -148,6 +263,7 @@ export default function Checkout() {
             successRedirectUrl: `${window.location.origin}/order-success/${order.orderNumber}`,
             customerName: customer.name,
             customerPhone: customer.phone,
+            customerEmail: customer.email || '',
             items: items.map(i => ({
               name: lang === 'id' ? i.name_id : i.name_en,
               quantity: i.qty,
@@ -212,7 +328,7 @@ export default function Checkout() {
         <StepIndicator steps={steps} current={step} />
 
         <div className="bg-white rounded-xl border border-slate-100 p-5 sm:p-8">
-          {step === 0 && (
+          {step === STEP_CUSTOMER && (
             <div className="space-y-5">
               <h2 className="text-base font-bold text-slate-900">{t('checkout_step_customer', lang)}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -220,52 +336,31 @@ export default function Checkout() {
                   <label className="block text-[12px] font-semibold text-slate-700 mb-1">
                     {t('checkout_name', lang)} <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={customer.name}
-                    onChange={e => setCustomer({ ...customer, name: e.target.value })}
+                  <input type="text" value={customer.name} onChange={e => setCustomer({ ...customer, name: e.target.value })}
                     className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 transition-all ${errors.name ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
-                    placeholder="Budi Santoso"
-                  />
+                    placeholder="Budi Santoso" />
                   {errors.name && <p className="text-[11px] text-red-500 mt-1">{errors.name}</p>}
                 </div>
                 <div>
-                  <label className="block text-[12px] font-semibold text-slate-700 mb-1">
-                    {t('checkout_phone', lang)} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={customer.phone}
-                    onChange={e => setCustomer({ ...customer, phone: e.target.value })}
+                  <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('checkout_phone', lang)} <span className="text-red-500">*</span></label>
+                  <input type="tel" value={customer.phone} onChange={e => setCustomer({ ...customer, phone: e.target.value })}
                     className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 transition-all ${errors.phone ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
-                    placeholder="08123456789"
-                  />
+                    placeholder="08123456789" />
                   {errors.phone && <p className="text-[11px] text-red-500 mt-1">{errors.phone}</p>}
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-[12px] font-semibold text-slate-700 mb-1">
-                    {t('checkout_address', lang)} <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={customer.address}
-                    onChange={e => setCustomer({ ...customer, address: e.target.value })}
+                  <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('checkout_address', lang)} <span className="text-red-500">*</span></label>
+                  <textarea value={customer.address} onChange={e => setCustomer({ ...customer, address: e.target.value })}
                     rows={3}
                     className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 transition-all resize-none ${errors.address ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
-                    placeholder="Jl. Kebon Jahe No. 123, Ilir Timur I"
-                  />
+                    placeholder="Jl. Kebon Jahe No. 123, Ilir Timur I" />
                   {errors.address && <p className="text-[11px] text-red-500 mt-1">{errors.address}</p>}
                 </div>
                 <div>
-                  <label className="block text-[12px] font-semibold text-slate-700 mb-1">
-                    {t('checkout_city', lang)} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={customer.city}
-                    onChange={e => setCustomer({ ...customer, city: e.target.value })}
+                  <label className="block text-[12px] font-semibold text-slate-700 mb-1">{t('checkout_city', lang)} <span className="text-red-500">*</span></label>
+                  <input type="text" value={customer.city} onChange={e => setCustomer({ ...customer, city: e.target.value })}
                     className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 transition-all ${errors.city ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
-                    placeholder="Palembang"
-                  />
+                    placeholder="Palembang" />
                   {errors.city && <p className="text-[11px] text-red-500 mt-1">{errors.city}</p>}
                 </div>
                 <div>
@@ -280,53 +375,108 @@ export default function Checkout() {
                     placeholder={lang === 'id' ? 'Catatan untuk penjual (opsional)' : 'Notes for seller (optional)'}
                   />
                 </div>
+                <div>
+                  <label className="block text-[12px] font-semibold text-slate-700 mb-1">
+                    {t('checkout_email', lang)} <span className="text-slate-400 font-normal">({lang === 'id' ? 'opsional' : 'optional'})</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={customer.email}
+                    onChange={e => setCustomer({ ...customer, email: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 transition-all"
+                    placeholder="email@example.com"
+                  />
+                </div>
               </div>
             </div>
           )}
 
-          {step === 1 && (
+          {step === STEP_SHIPPING && (
             <div>
               <h2 className="text-base font-bold text-slate-900 mb-4">{t('checkout_step_shipping', lang)}</h2>
-              <div className="space-y-3">
-                {SHIPPING_METHODS.map(s => (
-                  <label
-                    key={s.id}
-                    className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      shippingId === s.id
-                        ? 'border-brand-primary bg-sky-50'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="shipping"
-                      value={s.id}
-                      checked={shippingId === s.id}
-                      onChange={() => setShippingId(s.id)}
-                      className="accent-brand-primary w-4 h-4"
-                    />
-                    <div className="flex-1">
-                      <div className="font-bold text-sm text-slate-900">
-                        {lang === 'id' ? s.label_id : s.label_en}
-                      </div>
-                      <div className="text-[11px] text-slate-500">
-                        {lang === 'id' ? s.etd_id : s.etd_en}
-                      </div>
-                    </div>
-                    <div className="text-sm font-bold text-slate-900">
-                      {s.fee === 0 ? (lang === 'id' ? 'Gratis' : 'Free') : formatIDR(s.fee)}
-                    </div>
-                  </label>
-                ))}
+
+              {!hasCustomerStep && addresses.length > 0 && (
+                <div className="mb-5">
+                  <h3 className="text-[12px] font-bold text-slate-600 mb-2">{lang === 'id' ? 'Alamat Pengiriman' : 'Shipping Address'}</h3>
+                  <div className="space-y-2">
+                    {addresses.map(a => (
+                      <label key={a.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                        selectedAddrId === a.id ? 'border-brand-primary bg-sky-50' : 'border-slate-200 hover:border-slate-300'
+                      }`}>
+                        <input type="radio" name="address" checked={selectedAddrId === a.id}
+                          onChange={() => {
+                            setSelectedAddrId(a.id)
+                            setCustomer({ name: a.name, phone: a.phone, address: a.address, city: a.city, kecamatan: '', notes: customer.notes, email: customer.email })
+                          }} className="accent-brand-primary w-4 h-4 mt-0.5" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] font-bold text-slate-900">{a.label}</span>
+                            {a.isDefault && <span className="text-[10px] text-emerald-600 font-bold">{lang === 'id' ? 'Utama' : 'Default'}</span>}
+                          </div>
+                          <p className="text-[11px] text-slate-600">{a.name} — {a.phone}</p>
+                          <p className="text-[11px] text-slate-500">{a.address}, {a.city}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-5">
+                <label className="block text-[12px] font-semibold text-slate-700 mb-1">
+                  {lang === 'id' ? 'Kecamatan' : 'District'} <span className="text-slate-400 font-normal">({lang === 'id' ? 'ketik nama kecamatan' : 'type district name'})</span>
+                </label>
+                <input
+                  type="text"
+                  value={customer.kecamatan}
+                  onChange={e => {
+                    setCustomer({ ...customer, kecamatan: e.target.value })
+                    if (pricingTimer.current) clearTimeout(pricingTimer.current)
+                    pricingTimer.current = setTimeout(() => {
+                      fetchPricing(customer.city, e.target.value)
+                    }, 800)
+                  }}
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 transition-all"
+                  placeholder={lang === 'id' ? 'Contoh: Ilir Timur I' : 'e.g. Ilir Timur I'}
+                />
               </div>
+
+              {loadingShipping ? (
+                <div className="text-center py-8 text-slate-400 text-sm">
+                  <svg className="w-5 h-5 animate-spin inline mr-2" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                    <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
+                  </svg>
+                  {lang === 'id' ? 'Memuat ongkos kirim...' : 'Loading shipping rates...'}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {shippingRates.map(s => (
+                    <label key={s.id}
+                      className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        shippingId === s.id ? 'border-brand-primary bg-sky-50' : 'border-slate-200 hover:border-slate-300'
+                      }`}>
+                      <input type="radio" name="shipping" value={s.id} checked={shippingId === s.id}
+                        onChange={() => setShippingId(s.id)} className="accent-brand-primary w-4 h-4" />
+                      <div className="flex-1">
+                        <div className="font-bold text-sm text-slate-900">{lang === 'id' ? s.label_id : s.label_en}</div>
+                        <div className="text-[11px] text-slate-500">{lang === 'id' ? s.etd_id : s.etd_en}</div>
+                      </div>
+                      <div className="text-sm font-bold text-slate-900">
+                        {s.fee === 0 ? (lang === 'id' ? 'Gratis' : 'Free') : formatIDR(s.fee)}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {step === 2 && (
+          {step === STEP_PAYMENT && (
             <div>
               <h2 className="text-base font-bold text-slate-900 mb-4">{t('checkout_step_payment', lang)}</h2>
               <div className="space-y-3">
-                {PAYMENT_METHODS.map(p => (
+                {PAYMENT_METHODS.filter(p => USE_XENDIT || p.type !== 'ewallet').map(p => (
                   <label
                     key={p.id}
                     className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
@@ -370,25 +520,26 @@ export default function Checkout() {
             </div>
           )}
 
-          {step === 3 && (
+          {step === STEP_REVIEW && (
             <div>
               <h2 className="text-base font-bold text-slate-900 mb-5">{t('checkout_step_review', lang)}</h2>
               <div className="space-y-5">
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t('checkout_step_customer', lang)}</span>
-                    <button onClick={() => setStep(0)} className="text-[11px] text-brand-primary font-semibold hover:underline">{t('checkout_change', lang)}</button>
+                    <button onClick={() => setStep(STEP_CUSTOMER >= 0 ? STEP_CUSTOMER : STEP_SHIPPING)} className="text-[11px] text-brand-primary font-semibold hover:underline">{t('checkout_change', lang)}</button>
                   </div>
                   <p className="text-sm font-semibold text-slate-900">{customer.name}</p>
                   <p className="text-[12px] text-slate-600">{customer.phone}</p>
                   <p className="text-[12px] text-slate-600">{customer.address}, {customer.city}</p>
                   {customer.notes && <p className="text-[11px] text-slate-500 mt-1 italic">"{customer.notes}"</p>}
+                  {customer.kecamatan && <p className="text-[11px] text-slate-500 mt-1">{lang === 'id' ? 'Kecamatan' : 'District'}: {customer.kecamatan}</p>}
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t('checkout_step_shipping', lang)}</span>
-                    <button onClick={() => setStep(1)} className="text-[11px] text-brand-primary font-semibold hover:underline">{t('checkout_change', lang)}</button>
+                    <button onClick={() => setStep(STEP_SHIPPING)} className="text-[11px] text-brand-primary font-semibold hover:underline">{t('checkout_change', lang)}</button>
                   </div>
                   <p className="text-sm font-semibold text-slate-900">{lang === 'id' ? shipping.label_id : shipping.label_en}</p>
                   <p className="text-[12px] text-slate-500">{lang === 'id' ? shipping.etd_id : shipping.etd_en}</p>
@@ -400,7 +551,7 @@ export default function Checkout() {
                 <div className="p-4 bg-slate-50 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t('checkout_step_payment', lang)}</span>
-                    <button onClick={() => setStep(2)} className="text-[11px] text-brand-primary font-semibold hover:underline">{t('checkout_change', lang)}</button>
+                    <button onClick={() => setStep(STEP_PAYMENT)} className="text-[11px] text-brand-primary font-semibold hover:underline">{t('checkout_change', lang)}</button>
                   </div>
                   <p className="text-sm font-semibold text-slate-900">{lang === 'id' ? payment.label_id : payment.label_en}</p>
                   {payment.type === 'bank_transfer' && (

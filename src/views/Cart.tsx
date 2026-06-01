@@ -16,7 +16,7 @@ const t = (key: string, lang: 'id' | 'en'): string => lang === 'id' ? localeId[k
 export default function Cart() {
   const { lang } = useLang()
   const router = useRouter()
-  const { items, removeFromCart, updateQty, clearCart, subtotal } = useCart()
+  const { items, removeFromCart, removeVariantFromCart, updateQty, clearCart, subtotal } = useCart()
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
@@ -62,8 +62,9 @@ export default function Cart() {
                 {items.map(item => {
                   const name = lang === 'id' ? item.name_id : item.name_en
                   const discount = discountPercent(item.original_price_idr, item.price_idr)
+                  const itemKey = item.variantId ? item.id + '::' + item.variantId : item.id
                   return (
-                    <div key={item.id} className="bg-white rounded-xl border border-slate-100 p-3 sm:p-4">
+                    <div key={itemKey} className="bg-white rounded-xl border border-slate-100 p-3 sm:p-4">
                       <div className="flex gap-3 sm:gap-4">
                         <Link href={`/product/${item.id}`} className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 bg-slate-50 rounded-lg overflow-hidden border border-slate-100">
                           <img src={item.image} alt={name} className="w-full h-full object-cover" />
@@ -72,6 +73,11 @@ export default function Cart() {
                           <Link href={`/product/${item.id}`} className="text-[13px] font-semibold text-slate-900 line-clamp-2 hover:text-brand-primary transition-colors">
                             {name}
                           </Link>
+                          {item.variantLabel && (
+                            <span className="text-[10px] font-medium text-slate-500 block mt-0.5">
+                              {item.variantLabel}
+                            </span>
+                          )}
                           {discount > 0 && (
                             <span className="text-[10px] text-slate-400 line-through block mt-0.5">
                               {formatIDR(item.original_price_idr)}
@@ -83,11 +89,11 @@ export default function Cart() {
                           <div className="mt-2 flex items-center justify-between">
                             <QuantitySelector
                               value={item.qty}
-                              onChange={(qty) => updateQty(item.id, qty)}
+                              onChange={(qty) => updateQty(item.id, qty, item.variantId)}
                               max={item.stock_qty}
                             />
                             <button
-                              onClick={() => removeFromCart(item.id)}
+                              onClick={() => item.variantId ? removeVariantFromCart(item.id, item.variantId) : removeFromCart(item.id)}
                               className="text-[10px] font-bold text-slate-400 hover:text-red-500 transition-colors ml-3"
                             >
                               {t('cart_remove', lang)}

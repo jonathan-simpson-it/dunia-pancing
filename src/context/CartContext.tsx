@@ -5,7 +5,8 @@ interface CartContextValue {
   items: CartItem[]
   addToCart: (product: Product, qty?: number, variantId?: string, variantLabel?: string) => void
   removeFromCart: (productId: string) => void
-  updateQty: (productId: string, qty: number) => void
+  removeVariantFromCart: (productId: string, variantId: string) => void
+  updateQty: (productId: string, qty: number, variantId?: string) => void
   clearCart: () => void
   itemCount: number
   subtotal: number
@@ -43,6 +44,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = useCallback((product: Product, qty = 1, variantId?: string, variantLabel?: string) => {
     setItems(prev => {
       const cartId = variantId ? product.id + '::' + variantId : product.id
+      const variant = variantId ? product.variants?.find(v => v.id === variantId) : null
       const existing = prev.find(item => {
         const itemCartId = item.variantId ? item.id + '::' + item.variantId : item.id
         return itemCartId === cartId
@@ -59,10 +61,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         id: product.id,
         name_id: product.name_id,
         name_en: product.name_en,
-        image: variantId ? (product.variants?.find(v => v.id === variantId)?.image || product.image) : product.image,
-        price_idr: product.price_idr,
-        original_price_idr: product.original_price_idr,
-        stock_qty: product.stock_qty || 99,
+        image: variant?.image || product.image,
+        price_idr: variant?.price_idr || product.price_idr,
+        original_price_idr: variant?.original_price_idr || product.original_price_idr,
+        stock_qty: variant?.stock_qty || product.stock_qty || 99,
         category: product.category,
         brand: product.brand,
         qty,
@@ -76,17 +78,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems(prev => prev.filter(item => item.id !== productId))
   }, [])
 
-  const updateQty = useCallback((productId: string, qty: number) => {
+  const removeVariantFromCart = useCallback((productId: string, variantId: string) => {
+    const cartId = productId + '::' + variantId
+    setItems(prev => prev.filter(item => {
+      const itemCartId = item.variantId ? item.id + '::' + item.variantId : item.id
+      return itemCartId !== cartId
+    }))
+  }, [])
+
+  const updateQty = useCallback((productId: string, qty: number, variantId?: string) => {
+    const cartId = variantId ? productId + '::' + variantId : productId
     if (qty <= 0) {
-      setItems(prev => prev.filter(item => item.id !== productId))
+      setItems(prev => prev.filter(item => {
+        const itemCartId = item.variantId ? item.id + '::' + item.variantId : item.id
+        return itemCartId !== cartId
+      }))
       return
     }
     setItems(prev =>
-      prev.map(item =>
-        item.id === productId
+      prev.map(item => {
+        const itemCartId = item.variantId ? item.id + '::' + item.variantId : item.id
+        return itemCartId === cartId
           ? { ...item, qty: Math.min(qty, item.stock_qty) }
           : item
-      )
+      })
     )
   }, [])
 
@@ -102,6 +117,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       items,
       addToCart,
       removeFromCart,
+      removeVariantFromCart,
       updateQty,
       clearCart,
       itemCount,

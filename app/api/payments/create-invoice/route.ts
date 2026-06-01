@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       customer: {
         name: body.customerName,
         phone: body.customerPhone,
-        email: body.customerEmail,
+        email: body.customerEmail || '',
       },
       items: body.items || [],
       successRedirectUrl: `${request.headers.get('origin') || process.env.AUTH_URL}/order-success/${body.orderId}`,

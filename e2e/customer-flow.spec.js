@@ -87,7 +87,7 @@ test.describe('Customer Buying Flow (Priority)', () => {
     await page.waitForLoadState('load')
     await page.waitForTimeout(1000)
 
-    await expect(page.getByText('Joran Spinning Kaito 98')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Joran Spinning Kaito 98' })).toBeVisible()
     const buyBtn = page.getByRole('button', { name: /Beli Langsung|Buy Now/i })
     await expect(buyBtn).toBeVisible()
     await buyBtn.click()

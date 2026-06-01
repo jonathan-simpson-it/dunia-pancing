@@ -49,6 +49,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await auth()
+  const userId = (session?.user as any)?.id || null
   const body = await request.json()
 
   const now = new Date()
@@ -60,15 +62,32 @@ export async function POST(request: Request) {
   const seq = String(counter + 1).padStart(3, '0')
   const orderNumber = `DP-${dd}${mm}${yy}-${seq}`
 
+  const itemsData = body.items.map((item: any) => ({
+    productId: item.product_id || item.productId || null,
+    nameId: item.name_id || item.nameId,
+    nameEn: item.name_en || item.nameEn,
+    image: item.image || '',
+    priceIdr: item.price_idr ?? item.priceIdr,
+    qty: item.qty,
+    variantId: item.variantId || null,
+    variantLabel: item.variantLabel || null,
+  }))
+
   const order = await prisma.order.create({
     data: {
       orderNumber,
+      userId,
       status: 'waiting_payment',
       customerName: body.customer.name,
       customerPhone: body.customer.phone,
       customerAddress: body.customer.address,
       customerCity: body.customer.city,
-      customerNote: body.customer.notes,
+      customerNote: JSON.stringify({
+        text: body.customer.notes || '',
+        kecamatan: body.kecamatan || '',
+        kecamatanId: body.kecamatanId || null,
+        serviceType: body.shipping?.service_type || '',
+      }),
       subtotal: body.subtotal,
       discount: body.discount || 0,
       shippingFee: body.shipping?.fee || 0,
@@ -78,17 +97,7 @@ export async function POST(request: Request) {
       paymentType: body.payment?.type || '',
       paymentBank: body.payment?.bank || '',
       shopId: body.shopId || (await getDefaultShopId()),
-      items: {
-        create: body.items.map((item: any) => ({
-          nameId: item.name_id || item.nameId,
-          nameEn: item.name_en || item.nameEn,
-          image: item.image || '',
-          priceIdr: item.price_idr ?? item.priceIdr,
-          qty: item.qty,
-          variantId: item.variantId,
-          variantLabel: item.variantLabel,
-        })),
-      },
+      items: { create: itemsData },
       statusHistory: {
         create: {
           status: 'waiting_payment',
@@ -103,7 +112,7 @@ export async function POST(request: Request) {
   })
 
   for (const item of body.items) {
-    const productId = item.productId
+    const productId = item.product_id || item.productId
     if (!productId) continue
 
     try {

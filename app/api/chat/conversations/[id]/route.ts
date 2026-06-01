@@ -35,31 +35,36 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session || (session.user as any)?.role !== 'admin') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const session = await auth()
+    if (!session || (session.user as any)?.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = await params
+    const body = await request.json()
+
+    if (!body.text) {
+      return NextResponse.json({ error: 'Message text required' }, { status: 400 })
+    }
+
+    await prisma.conversation.update({
+      where: { id },
+      data: {},
+    })
+
+    const message = await prisma.chatMessage.create({
+      data: {
+        text: body.text.trim(),
+        sender: 'admin',
+        read: true,
+        conversationId: id,
+      },
+    })
+
+    return NextResponse.json(message, { status: 201 })
+  } catch (error: any) {
+    console.error('Chat POST error:', error)
+    return NextResponse.json({ error: error?.message || 'Internal error' }, { status: 500 })
   }
-
-  const { id } = await params
-  const body = await request.json()
-
-  if (!body.text) {
-    return NextResponse.json({ error: 'Message text required' }, { status: 400 })
-  }
-
-  await prisma.conversation.update({
-    where: { id },
-    data: { updatedAt: new Date() },
-  })
-
-  const message = await prisma.chatMessage.create({
-    data: {
-      text: body.text.trim(),
-      sender: 'admin',
-      read: true,
-      conversationId: id,
-    },
-  })
-
-  return NextResponse.json(message, { status: 201 })
 }

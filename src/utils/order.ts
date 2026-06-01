@@ -1,89 +1,268 @@
 import type { Order, OrderItem, Customer, ShippingInfo, PaymentInfo, ShippingOption, PaymentOption, OrderStatus, LogisticsInfo, StatusHistoryEntry } from '../types'
 
-const STORAGE_KEY = 'dunia-pancing-orders'
-let orderCounter: number | null = null
-
-function loadCounter(): number {
+function parseCustomerNote(note: string | null | undefined): { text: string; kecamatan: string; kecamatanId: number | null; serviceType: string } {
   try {
-    const raw = localStorage.getItem('dunia-pancing-order-counter')
-    return raw ? parseInt(raw, 10) : 0
-  } catch {
-    return 0
-  }
+    if (note && note.startsWith('{')) return JSON.parse(note)
+  } catch {}
+  return { text: note || '', kecamatan: '', kecamatanId: null, serviceType: '' }
 }
 
-function saveCounter(val: number): void {
-  try {
-    localStorage.setItem('dunia-pancing-order-counter', val.toString())
-  } catch { /* noop */ }
-}
-
-function getNextId(): { id: string; seq: number } {
-  if (orderCounter === null) orderCounter = loadCounter()
-  orderCounter++
-  saveCounter(orderCounter)
-  const now = new Date()
-  const dd = String(now.getDate()).padStart(2, '0')
-  const mm = String(now.getMonth() + 1).padStart(2, '0')
-  const yy = String(now.getFullYear()).slice(2)
-  const seq = String(orderCounter).padStart(3, '0')
-  return { id: `DP-${dd}${mm}${yy}-${seq}`, seq: orderCounter }
-}
-
-interface CreateOrderInput {
-  items: OrderItem[]
-  subtotal: number
-  customer: Customer
-  shipping: ShippingInfo
-  payment: PaymentInfo
-}
-
-export function createOrder({ items, subtotal, customer, shipping, payment }: CreateOrderInput): Order {
-  const { id } = getNextId()
-  const now = new Date().toISOString()
-  const initialHistory: StatusHistoryEntry = { status: 'waiting_payment', timestamp: now }
-  const order: Order = {
-    id,
-    date: now,
-    status: 'waiting_payment',
-    items: items.map(item => ({
-      id: item.id,
-      name_id: item.name_id,
-      name_en: item.name_en,
-      image: item.image,
-      price_idr: item.price_idr,
-      qty: item.qty,
+function mapDbOrderToLocal(dbo: any): Order {
+  const parsedNote = parseCustomerNote(dbo.customerNote)
+  return {
+    id: dbo.orderNumber || dbo.id,
+    date: dbo.createdAt,
+    status: dbo.status,
+    items: (dbo.items || []).map((i: any) => ({
+      id: i.productId || i.product?.id || i.id,
+      name_id: i.nameId || i.name_id || '',
+      name_en: i.nameEn || i.name_en || '',
+      image: i.image || '',
+      price_idr: i.priceIdr ?? i.price_idr ?? 0,
+      qty: i.qty ?? 1,
     })),
-    customer: { ...customer },
-    shipping: { ...shipping },
-    payment: { ...payment },
-    subtotal,
-    shipping_fee: shipping.fee,
-    total: subtotal + shipping.fee,
-    statusHistory: [initialHistory],
+    customer: {
+      name: dbo.customerName,
+      phone: dbo.customerPhone,
+      address: dbo.customerAddress || '',
+      city: dbo.customerCity || '',
+      notes: parsedNote.text,
+      kecamatan: parsedNote.kecamatan,
+      kecamatanId: parsedNote.kecamatanId,
+    },
+    shipping: {
+      id: dbo.courier || '',
+      label: dbo.shippingLabel || '',
+      fee: dbo.shippingFee ?? 0,
+      serviceType: parsedNote.serviceType,
+    },
+    payment: {
+      id: '',
+      label: dbo.paymentMethod || '',
+      method: dbo.paymentType || '',
+      bank: dbo.paymentBank || '',
+      accountNumber: '',
+    },
+    subtotal: dbo.subtotal ?? 0,
+    shipping_fee: dbo.shippingFee ?? 0,
+    discount: dbo.discount ?? 0,
+    total: dbo.total ?? 0,
+    logistics: dbo.courier ? {
+      courier: dbo.courier,
+      courierLabel: dbo.courierLabel || dbo.courier,
+      trackingNumber: dbo.awbNumber || '',
+      awbPrinted: dbo.awbPrinted || false,
+      pickupType: dbo.pickupType || 'dropoff',
+      pickupWindow: dbo.pickupWindow,
+      shippedAt: dbo.shippedAt,
+      deliveredAt: dbo.deliveredAt,
+    } : undefined,
+    cancelNote: dbo.cancelNote,
+    statusHistory: (dbo.statusHistory || []).map((h: any) => ({
+      status: h.status,
+      timestamp: h.timestamp || h.createdAt,
+      note: h.note,
+    })),
   }
+}
 
-  const orders = loadOrders()
-  orders.unshift(order)
+export async function loadOrders(): Promise<Order[]> {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders))
-  } catch { /* noop */ }
-
-  return order
+    const res = await fetch('/api/orders?pageSize=1000')
+    if (res.ok) {
+      const data = await res.json()
+      return (data.orders || []).map(mapDbOrderToLocal)
+    }
+  } catch {}
+  return []
 }
 
-export function loadOrders(): Order[] {
+export async function getOrder(orderId: string): Promise<Order | null> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
+    const res = await fetch(`/api/orders?pageSize=1&search=${encodeURIComponent(orderId)}`)
+    if (res.ok) {
+      const data = await res.json()
+      const found = (data.orders || []).find((o: any) =>
+        (o.orderNumber || o.id) === orderId ||
+        o.customerName?.toLowerCase().includes(orderId.toLowerCase())
+      )
+      if (found) return mapDbOrderToLocal(found)
+    }
+  } catch {}
+  return null
 }
 
-export function getOrder(orderId: string): Order | null {
-  return loadOrders().find(o => o.id === orderId) || null
+export async function loadPaginatedOrders(
+  page: number,
+  pageSize: number,
+  statusFilter?: OrderStatus | null,
+  search?: string,
+  sortField?: 'date' | 'total',
+  sortDir?: 'asc' | 'desc',
+): Promise<{ orders: Order[]; total: number; page: number; totalPages: number }> {
+  try {
+    const params = new URLSearchParams()
+    params.set('page', String(page))
+    params.set('pageSize', String(pageSize))
+    if (statusFilter) params.set('status', statusFilter)
+    if (search) params.set('search', search)
+    if (sortField) params.set('sortField', sortField)
+    if (sortDir) params.set('sortDir', sortDir)
+
+    const res = await fetch(`/api/orders?${params.toString()}`)
+    if (res.ok) {
+      const data = await res.json()
+      return {
+        orders: (data.orders || []).map(mapDbOrderToLocal),
+        total: data.total || 0,
+        page: data.page || page,
+        totalPages: data.totalPages || 1,
+      }
+    }
+  } catch {}
+
+  return { orders: [], total: 0, page, totalPages: 0 }
 }
+
+export async function getStatusCounts(): Promise<Record<string, number>> {
+  try {
+    const res = await fetch('/api/orders?pageSize=1000')
+    if (res.ok) {
+      const data = await res.json()
+      const orders = data.orders || []
+      const counts: Record<string, number> = { all: orders.length }
+      orders.forEach((o: any) => {
+        const s = o.status || 'unknown'
+        counts[s] = (counts[s] || 0) + 1
+      })
+      return counts
+    }
+  } catch {}
+  return { all: 0 }
+}
+
+export async function getOrderSingle(orderId: string): Promise<Order | null> {
+  try {
+    const res = await fetch(`/api/orders/${orderId}`)
+    if (res.ok) {
+      const data = await res.json()
+      return mapDbOrderToLocal(data)
+    }
+  } catch {}
+  return null
+}
+
+export async function updateOrderStatus(orderId: string, newStatus: OrderStatus, note?: string): Promise<Order | null> {
+  try {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus, note }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      return mapDbOrderToLocal(data)
+    }
+  } catch {}
+  return null
+}
+
+export async function assignResi(
+  orderId: string,
+  courier: string,
+  courierLabel: string,
+  trackingNumber: string,
+  pickupType: 'dropoff' | 'pickup',
+  pickupWindow?: string,
+): Promise<Order | null> {
+  try {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: 'shipping',
+        courier,
+        courierLabel,
+        awbNumber: trackingNumber,
+        note: `Resi: ${trackingNumber} (${courierLabel})`,
+      }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      return mapDbOrderToLocal(data)
+    }
+  } catch {}
+  return null
+}
+
+export async function markAwbPrinted(orderId: string): Promise<Order | null> {
+  return updateOrderStatus(orderId, 'shipping', 'AWB printed')
+}
+
+export async function bulkUpdateOrderStatus(ids: string[], newStatus: OrderStatus, note?: string): Promise<Order[]> {
+  const results = await Promise.allSettled(
+    ids.map(id =>
+      fetch(`/api/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus, note }),
+      }).then(r => r.ok ? r.json() : null)
+    )
+  )
+  return results
+    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled' && r.value)
+    .map(r => mapDbOrderToLocal(r.value))
+}
+
+export async function bulkAssignResi(
+  items: { orderId: string; courier: string; courierLabel: string; trackingNumber: string; pickupType: 'dropoff' | 'pickup' }[],
+): Promise<{ success: Order[]; failed: string[] }> {
+  const success: Order[] = []
+  const failed: string[] = []
+
+  const results = await Promise.allSettled(
+    items.map(item =>
+      fetch(`/api/orders/${item.orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'shipping',
+          courier: item.courier,
+          courierLabel: item.courierLabel,
+          awbNumber: item.trackingNumber,
+          note: `Resi: ${item.trackingNumber} (${item.courierLabel})`,
+        }),
+      }).then(r => r.ok ? { orderId: item.orderId, data: r.json() } : null)
+    )
+  )
+
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled' && r.value) {
+      success.push(mapDbOrderToLocal(r.value))
+    } else {
+      failed.push(items[i].orderId)
+    }
+  })
+
+  return { success, failed }
+}
+
+export async function cancelOrder(orderId: string, reason: string): Promise<Order | null> {
+  try {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'cancelled', cancelNote: reason, note: reason }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      return mapDbOrderToLocal(data)
+    }
+  } catch {}
+  return null
+}
+
+export async function clearOrders(): Promise<void> {}
 
 export function buildWhatsAppMessage(order: Order, lang: 'id' | 'en'): string {
   const lines = order.items.map(item => {
@@ -138,7 +317,7 @@ export function printInvoice(order: Order): void {
     </tr>
   `).join('')
 
-  const barcodeUrl = `https://barcode.tec-it.com/barcode.ashx?data=${order.id}&code=Code128&translate-esc=true&dpi=96&imagetype=png`
+  const barcodeUrl = `https://barcode.tec-it.com/barcode.ashx?data=${order.id}&code=Code128&translate-esc=true&dpi=300&imagetype=png`
 
   printWindow.document.write(`
 <!DOCTYPE html>
@@ -267,185 +446,6 @@ ${order.customer.notes ? `<div class="note"><strong>Catatan Pelanggan:</strong> 
   printWindow.document.close()
   printWindow.focus()
   setTimeout(() => printWindow.print(), 500)
-}
-
-function saveOrders(orders: Order[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders))
-  } catch { /* noop */ }
-}
-
-function pushStatusHistory(order: Order, status: OrderStatus, note?: string): void {
-  order.statusHistory.push({ status, timestamp: new Date().toISOString(), note })
-}
-
-export function updateOrderStatus(orderId: string, newStatus: OrderStatus, note?: string): Order | null {
-  const orders = loadOrders()
-  const idx = orders.findIndex(o => o.id === orderId)
-  if (idx === -1) return null
-  orders[idx].status = newStatus
-  pushStatusHistory(orders[idx], newStatus, note)
-  saveOrders(orders)
-  return orders[idx]
-}
-
-export function assignResi(
-  orderId: string,
-  courier: string,
-  courierLabel: string,
-  trackingNumber: string,
-  pickupType: 'dropoff' | 'pickup',
-  pickupWindow?: string,
-): Order | null {
-  const orders = loadOrders()
-  const idx = orders.findIndex(o => o.id === orderId)
-  if (idx === -1) return null
-
-  orders[idx].logistics = {
-    courier,
-    courierLabel,
-    trackingNumber,
-    awbPrinted: false,
-    pickupType,
-    pickupWindow,
-    shippedAt: new Date().toISOString(),
-  }
-  orders[idx].status = 'shipping'
-  pushStatusHistory(orders[idx], 'shipping', `Resi: ${trackingNumber} (${courierLabel})`)
-  saveOrders(orders)
-  return orders[idx]
-}
-
-export function markAwbPrinted(orderId: string): Order | null {
-  const orders = loadOrders()
-  const idx = orders.findIndex(o => o.id === orderId)
-  if (idx === -1) return null
-  if (orders[idx].logistics) orders[idx].logistics.awbPrinted = true
-  saveOrders(orders)
-  return orders[idx]
-}
-
-export function bulkUpdateOrderStatus(ids: string[], newStatus: OrderStatus, note?: string): Order[] {
-  const orders = loadOrders()
-  const updated: Order[] = []
-  ids.forEach(id => {
-    const idx = orders.findIndex(o => o.id === id)
-    if (idx !== -1) {
-      orders[idx].status = newStatus
-      pushStatusHistory(orders[idx], newStatus, note)
-      updated.push(orders[idx])
-    }
-  })
-  saveOrders(orders)
-  return updated
-}
-
-export function bulkAssignResi(
-  items: { orderId: string; courier: string; courierLabel: string; trackingNumber: string; pickupType: 'dropoff' | 'pickup' }[],
-): { success: Order[]; failed: string[] } {
-  const orders = loadOrders()
-  const success: Order[] = []
-  const failed: string[] = []
-
-  items.forEach(item => {
-    const idx = orders.findIndex(o => o.id === item.orderId)
-    if (idx === -1) {
-      failed.push(item.orderId)
-      return
-    }
-    try {
-      orders[idx].logistics = {
-        courier: item.courier,
-        courierLabel: item.courierLabel,
-        trackingNumber: item.trackingNumber,
-        awbPrinted: false,
-        pickupType: item.pickupType,
-        shippedAt: new Date().toISOString(),
-      }
-      orders[idx].status = 'shipping'
-      pushStatusHistory(orders[idx], 'shipping', `Resi: ${item.trackingNumber} (${item.courierLabel})`)
-      success.push(orders[idx])
-    } catch {
-      failed.push(item.orderId)
-    }
-  })
-
-  saveOrders(orders)
-  return { success, failed }
-}
-
-export function loadOrdersByStatus(status?: OrderStatus): Order[] {
-  const orders = loadOrders()
-  if (!status) return orders
-  return orders.filter(o => o.status === status)
-}
-
-export function loadPaginatedOrders(
-  page: number,
-  pageSize: number,
-  statusFilter?: OrderStatus | null,
-  search?: string,
-  sortField?: 'date' | 'total',
-  sortDir?: 'asc' | 'desc',
-): { orders: Order[]; total: number; page: number; totalPages: number } {
-  let orders = loadOrders()
-
-  if (statusFilter) {
-    orders = orders.filter(o => o.status === statusFilter)
-  }
-
-  if (search && search.trim()) {
-    const q = search.toLowerCase().trim()
-    orders = orders.filter(o =>
-      o.id.toLowerCase().includes(q) ||
-      o.customer.name.toLowerCase().includes(q) ||
-      o.customer.phone.toLowerCase().includes(q) ||
-      (o.logistics?.trackingNumber || '').toLowerCase().includes(q),
-    )
-  }
-
-  if (sortField === 'total') {
-    orders.sort((a, b) => sortDir === 'asc' ? a.total - b.total : b.total - a.total)
-  } else {
-    orders.sort((a, b) => {
-      const diff = new Date(b.date).getTime() - new Date(a.date).getTime()
-      return sortDir === 'asc' ? -diff : diff
-    })
-  }
-
-  const total = orders.length
-  const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const start = (page - 1) * pageSize
-  const paged = orders.slice(start, start + pageSize)
-
-  return { orders: paged, total, page, totalPages }
-}
-
-export function getStatusCounts(): Record<string, number> {
-  const orders = loadOrders()
-  const counts: Record<string, number> = { all: orders.length }
-  orders.forEach(o => {
-    const s = o.status || 'unknown'
-    counts[s] = (counts[s] || 0) + 1
-  })
-  return counts
-}
-
-export function cancelOrder(orderId: string, reason: string): Order | null {
-  const orders = loadOrders()
-  const idx = orders.findIndex(o => o.id === orderId)
-  if (idx === -1) return null
-  orders[idx].status = 'cancelled'
-  orders[idx].cancelNote = reason
-  pushStatusHistory(orders[idx], 'cancelled', reason)
-  saveOrders(orders)
-  return orders[idx]
-}
-
-export function clearOrders(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch { /* noop */ }
 }
 
 // ─── Courier prefixes for mock resi generation ──────────

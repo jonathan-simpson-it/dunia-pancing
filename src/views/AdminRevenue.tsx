@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import { useAuth } from '../context/AuthContext'
@@ -22,34 +22,41 @@ export default function AdminRevenue() {
   const { lang } = useLang()
   const { user, logout } = useAuth()
   const { products } = useProducts()
+  const [data, setData] = useState({
+    totalRevenue: 0, totalOrders: 0, totalItems: 0, avgOrder: 0,
+    byPayment: {} as Record<string, number>,
+    byShipping: {} as Record<string, number>,
+    byMonth: {} as Record<string, number>,
+    topProducts: [] as any[],
+    orders: [] as any[],
+  })
 
-  const data = useMemo(() => {
-    const orders = loadOrders()
-    const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0)
-    const totalOrders = orders.length
-    const totalItems = orders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.qty, 0), 0)
-    const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0
+  useEffect(() => {
+    loadOrders().then(orders => {
+      const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0)
+      const totalOrders = orders.length
+      const totalItems = orders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.qty, 0), 0)
+      const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0
 
-    const byPayment: Record<string, number> = {}
-    const byShipping: Record<string, number> = {}
-    const byMonth: Record<string, number> = {}
+      const byPayment: Record<string, number> = {}
+      const byShipping: Record<string, number> = {}
+      const byMonth: Record<string, number> = {}
 
-    orders.forEach(o => {
-      const pm = o.payment?.label || 'Unknown'
-      byPayment[pm] = (byPayment[pm] || 0) + o.total
+      orders.forEach(o => {
+        const pm = o.payment?.label || 'Unknown'
+        byPayment[pm] = (byPayment[pm] || 0) + o.total
+        const sm = o.shipping?.label || 'Unknown'
+        byShipping[sm] = (byShipping[sm] || 0) + o.total
+        const m = new Date(o.date).toLocaleDateString('id-ID', { month: 'short', year: '2-digit' })
+        byMonth[m] = (byMonth[m] || 0) + o.total
+      })
 
-      const sm = o.shipping?.label || 'Unknown'
-      byShipping[sm] = (byShipping[sm] || 0) + o.total
+      const topProducts = [...products]
+        .sort((a, b) => (b.sold_count || 0) - (a.sold_count || 0))
+        .slice(0, 10)
 
-      const m = new Date(o.date).toLocaleDateString('id-ID', { month: 'short', year: '2-digit' })
-      byMonth[m] = (byMonth[m] || 0) + o.total
+      setData({ totalRevenue, totalOrders, totalItems, avgOrder, byPayment, byShipping, byMonth, topProducts, orders })
     })
-
-    const topProducts = [...products]
-      .sort((a, b) => (b.sold_count || 0) - (a.sold_count || 0))
-      .slice(0, 10)
-
-    return { orders, totalRevenue, totalOrders, totalItems, avgOrder, byPayment, byShipping, byMonth, topProducts }
   }, [products])
 
   const stats = [

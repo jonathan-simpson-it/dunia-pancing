@@ -103,12 +103,15 @@ export interface Customer {
   address: string
   city: string
   notes?: string
+  kecamatan?: string
+  kecamatanId?: number | null
 }
 
 export interface ShippingInfo {
   id: string
   label: string
   fee: number
+  serviceType?: string
 }
 
 export interface PaymentInfo {
@@ -155,6 +158,7 @@ export interface Order {
   payment: PaymentInfo
   subtotal: number
   shipping_fee: number
+  discount?: number
   total: number
   logistics?: LogisticsInfo
   statusHistory: StatusHistoryEntry[]

@@ -1,6 +1,6 @@
 # Dunia Pancing — Fishing Tackle E-Commerce Platform
 
-A fully client-side React e-commerce web application for a fishing tackle store in Palembang, Indonesia. Built with React 19, Vite 6, Tailwind CSS 4, and React Router 7. All data is stored locally in `localStorage`.
+A fullstack Next.js 15 App Router e-commerce web application for a fishing tackle store in Palembang, Indonesia. Features a hybrid architecture blending client-side components with a Prisma (SQLite/Postgres) database integration.
 
 🔗 **Repository**: https://github.com/jonathan-simpson-it/dunia-pancing.git  
 🌐 **Multilingual**: Supports Indonesian (ID) and English (EN)
@@ -56,18 +56,20 @@ A fully client-side React e-commerce web application for a fishing tackle store 
 
 ## 🛠️ Tech Stack
 
-| Layer                | Technology              |
-| -------------------- | ----------------------- |
-| **Framework**        | React 19 + React DOM 19 |
-| **Build Tool**       | Vite 6                  |
-| **Styling**          | Tailwind CSS 4          |
-| **Routing**          | React Router 7          |
-| **State Management** | React Context API       |
-| **SEO**              | React Helmet Async      |
-| **Barcodes**         | jsbarcode (SVG)         |
-| **Excel**            | xlsx (import/export)    |
-| **Testing**          | Playwright              |
-| **Package Manager**  | npm                     |
+| Layer                    | Technology                       |
+| ------------------------ | -------------------------------- |
+| **Framework**            | Next.js 15 (App Router)          |
+| **UI Library**           | React 19                         |
+| **Styling**              | Tailwind CSS 4                   |
+| **Database ORM**         | Prisma 7                         |
+| **Authentication**       | NextAuth.js v5                   |
+| **Payments Integration** | Xendit                           |
+| **Shipping API**         | KiriminAja                       |
+| **Database**             | SQLite (dev) / PostgreSQL (prod) |
+| **Barcodes**             | jsbarcode (SVG)                  |
+| **Excel**                | xlsx (import/export)             |
+| **Testing**              | Playwright                       |
+| **Package Manager**      | npm                              |
 
 ### Browser Support
 
@@ -94,6 +96,13 @@ cd dunia-pancing
 
 # Install dependencies
 npm install
+
+# Setup environment variables
+cp .env.example .env
+# Edit .env with your Google, Xendit, and KiriminAja credentials
+
+# Sync the database schema and generate Prisma client
+npx prisma db push
 
 # Verify installation
 npm run dev

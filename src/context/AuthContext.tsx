@@ -5,7 +5,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import type { Session } from 'next-auth'
 
 interface AuthContextValue {
-  user: { username: string; role: string; name: string; phone?: string } | null
+  user: { id?: string; username: string; role: string; name: string; phone?: string } | null
   login: (username: string, password: string) => Promise<boolean>
   register: (data: { name: string; phone: string; password: string }) => Promise<boolean>
   logout: () => void
@@ -22,9 +22,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const user = session?.user
     ? {
+        id: session.user.id,
         username: (session.user as any).username || session.user.email || '',
         role: (session.user as any).role || 'client',
         name: session.user.name || '',
+        phone: (session.user as any).username || '',
       }
     : null
 

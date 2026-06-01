@@ -64,11 +64,27 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const sendMessage = useCallback((text: string, lang?: 'id' | 'en') => {
     if (!text.trim()) return
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.trim(), sessionId: sessionId.current, lang: lang || 'id' }),
-    }).then(() => syncMessages())
+    try {
+      const name = localStorage.getItem('dunia-pancing-session-name') || ''
+      const phone = localStorage.getItem('dunia-pancing-session-phone') || ''
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: text.trim(),
+          sessionId: sessionId.current,
+          name: name || undefined,
+          phone: phone || undefined,
+          lang: lang || 'id',
+        }),
+      }).then(() => syncMessages())
+    } catch {
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.trim(), sessionId: sessionId.current, lang: lang || 'id' }),
+      }).then(() => syncMessages())
+    }
   }, [syncMessages])
 
   const openChat = useCallback(() => {
