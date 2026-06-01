@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { auth } from '@/lib/auth'
 
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     ? variants.some((v: any) => (v.stock_qty ?? v.stockQty ?? 0) > 0)
     : stockQty > 0
 
-  const product = await prisma.$transaction(async (tx) => {
+  const product = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const productId = body.id || undefined
     const created = await tx.product.create({
       data: {
