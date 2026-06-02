@@ -24,4 +24,5 @@ export async function clearState(page) {
     const keys = Object.keys(localStorage).filter(k => k.startsWith('dunia-pancing-'))
     keys.forEach(k => localStorage.removeItem(k))
   })
+  await page.context().clearCookies()
 }

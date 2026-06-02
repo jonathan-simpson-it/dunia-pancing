@@ -66,15 +66,28 @@ function mapDbOrderToLocal(dbo: any): Order {
   }
 }
 
+function loadLocalOrders(): Order[] {
+  try {
+    const raw = localStorage.getItem('dunia-pancing-orders')
+    if (raw) return JSON.parse(raw)
+  } catch {}
+  return []
+}
+
 export async function loadOrders(): Promise<Order[]> {
+  const localOrders = loadLocalOrders()
   try {
     const res = await fetch('/api/orders?pageSize=1000')
     if (res.ok) {
       const data = await res.json()
-      return (data.orders || []).map(mapDbOrderToLocal)
+      if (data.orders && data.orders.length > 0) {
+        const apiOrders: Order[] = (data.orders || []).map(mapDbOrderToLocal)
+        const apiIds = new Set(apiOrders.map((o: Order) => o.id))
+        return [...apiOrders, ...localOrders.filter((o: Order) => !apiIds.has(o.id))]
+      }
     }
   } catch {}
-  return []
+  return localOrders.length > 0 ? localOrders : []
 }
 
 export async function getOrder(orderId: string): Promise<Order | null> {
@@ -89,6 +102,10 @@ export async function getOrder(orderId: string): Promise<Order | null> {
       if (found) return mapDbOrderToLocal(found)
     }
   } catch {}
+  const localOrders = loadLocalOrders()
+  if (localOrders.length > 0) {
+    return localOrders.find(o => o.id === orderId) || null
+  }
   return null
 }
 
@@ -112,33 +129,74 @@ export async function loadPaginatedOrders(
     const res = await fetch(`/api/orders?${params.toString()}`)
     if (res.ok) {
       const data = await res.json()
-      return {
-        orders: (data.orders || []).map(mapDbOrderToLocal),
-        total: data.total || 0,
-        page: data.page || page,
-        totalPages: data.totalPages || 1,
+      if (data.orders && data.orders.length > 0) {
+        const apiOrders: Order[] = (data.orders || []).map(mapDbOrderToLocal)
+        const localOrders = loadLocalOrders()
+        const apiIds = new Set(apiOrders.map((o: Order) => o.id))
+        let merged: Order[] = [...apiOrders, ...localOrders.filter((o: Order) => !apiIds.has(o.id))]
+        if (statusFilter) merged = merged.filter((o: Order) => o.status === statusFilter)
+        if (search) {
+          const q = search.toLowerCase()
+          merged = merged.filter((o: Order) =>
+            o.id.toLowerCase().includes(q) ||
+            o.customer.name.toLowerCase().includes(q) ||
+            o.customer.phone.includes(q)
+          )
+        }
+        const total = merged.length
+        const start = (page - 1) * pageSize
+        return {
+          orders: merged.slice(start, start + pageSize),
+          total,
+          page,
+          totalPages: Math.ceil(total / pageSize) || 1,
+        }
       }
     }
   } catch {}
+
+  const localOrders = loadLocalOrders()
+  if (localOrders.length > 0) {
+    let filtered: Order[] = localOrders
+    if (statusFilter) filtered = filtered.filter((o: Order) => o.status === statusFilter)
+    if (search) {
+      const q = search.toLowerCase()
+      filtered = filtered.filter((o: Order) =>
+        o.id.toLowerCase().includes(q) ||
+        o.customer.name.toLowerCase().includes(q) ||
+        o.customer.phone.includes(q)
+      )
+    }
+    const total = filtered.length
+    const start = (page - 1) * pageSize
+    return {
+      orders: filtered.slice(start, start + pageSize),
+      total,
+      page,
+      totalPages: Math.ceil(total / pageSize) || 1,
+    }
+  }
 
   return { orders: [], total: 0, page, totalPages: 0 }
 }
 
 export async function getStatusCounts(): Promise<Record<string, number>> {
+  const localOrders = loadLocalOrders()
+  let allOrders: Order[] = [...localOrders]
   try {
     const res = await fetch('/api/orders?pageSize=1000')
     if (res.ok) {
       const data = await res.json()
-      const orders = data.orders || []
-      const counts: Record<string, number> = { all: orders.length }
-      orders.forEach((o: any) => {
-        const s = o.status || 'unknown'
-        counts[s] = (counts[s] || 0) + 1
-      })
-      return counts
+      const apiOrders: Order[] = (data.orders || []).map(mapDbOrderToLocal)
+      const apiIds = new Set(apiOrders.map((o: Order) => o.id))
+      allOrders = [...apiOrders, ...localOrders.filter((o: Order) => !apiIds.has(o.id))]
     }
   } catch {}
-  return { all: 0 }
+  const counts: Record<string, number> = { all: allOrders.length }
+  allOrders.forEach((o: Order) => {
+    counts[o.status] = (counts[o.status] || 0) + 1
+  })
+  return counts
 }
 
 export async function getOrderSingle(orderId: string): Promise<Order | null> {

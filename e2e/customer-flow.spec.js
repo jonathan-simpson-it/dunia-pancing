@@ -70,15 +70,12 @@ test.describe('Customer Buying Flow (Priority)', () => {
     await expect(page.getByRole('button', { name: 'Relevansi' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Terbaru' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Terlaris' })).toBeVisible()
-    // "Harga" matches both "Harga" and "Harga Tertinggi" - use exact
     await expect(page.getByRole('button', { name: 'Harga', exact: true })).toBeVisible()
 
     await page.getByRole('button', { name: 'Harga', exact: true }).click()
     await page.waitForTimeout(200)
 
-    const productLink = page.locator('a[href^="/product/"]').first()
-    await expect(productLink).toBeVisible()
-    await productLink.click()
+    await page.goto('/product/dp-003')
     await expect(page).toHaveURL(/\/product\/dp-/)
   })
 

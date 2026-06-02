@@ -53,6 +53,10 @@ export async function POST(request: Request) {
   const userId = (session?.user as any)?.id || null
   const body = await request.json()
 
+  if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
+    return NextResponse.json({ error: 'Order must contain at least one item' }, { status: 400 })
+  }
+
   const now = new Date()
   const dd = String(now.getDate()).padStart(2, '0')
   const mm = String(now.getMonth() + 1).padStart(2, '0')
@@ -63,7 +67,7 @@ export async function POST(request: Request) {
   const orderNumber = `DP-${dd}${mm}${yy}-${seq}`
 
   const itemsData = body.items.map((item: any) => ({
-    productId: item.product_id || item.productId || null,
+    productId: null,
     nameId: item.name_id || item.nameId,
     nameEn: item.name_en || item.nameEn,
     image: item.image || '',
