@@ -61,7 +61,7 @@ export default function Hero() {
             {[
               { label: 'Products', val: '2k+' },
               { label: 'Customers', val: '10k+' },
-              { label: 'Experience', val: '15y' }
+              { label: 'Experience', val: '28y' }
             ].map(stat => (
               <div key={stat.label}>
                 <div className="text-2xl font-black text-white">{stat.val}</div>
