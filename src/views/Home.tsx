@@ -17,6 +17,30 @@ export default function Home() {
     <div className="bg-slate-50">
       <Hero />
 
+      <section className="py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              { number: '15+', label: lang === 'id' ? 'Tahun Pengalaman' : 'Years Experience', desc: lang === 'id' ? 'Melayani pemancing Palembang sejak 2011' : 'Serving Palembang anglers since 2011' },
+              { number: '1000+', label: lang === 'id' ? 'Pelanggan Puas' : 'Happy Customers', desc: lang === 'id' ? 'Toko alat pancing terpercaya' : 'Trusted fishing gear store' },
+              { number: '50+', label: lang === 'id' ? 'Brand Tersedia' : 'Brands Available', desc: lang === 'id' ? 'Dealer resmi brand internasional' : 'Official international brand dealer' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center p-10 bg-slate-50 rounded-4xl border border-slate-100">
+                <div className="text-5xl sm:text-7xl font-display font-black text-sky-600 leading-none mb-3">
+                  {stat.number}
+                </div>
+                <div className="text-sm font-black text-slate-900 uppercase tracking-widest mb-2">
+                  {stat.label}
+                </div>
+                <div className="text-slate-400 text-sm font-medium">
+                  {stat.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-24 max-w-7xl mx-auto px-4">
         <div className="text-center">
           <div className="w-20 h-20 bg-sky-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -93,7 +117,7 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent" />
                 <div className="absolute bottom-10 left-10">
-                  <div className="text-4xl font-black text-white leading-none">25+</div>
+                  <div className="text-4xl font-black text-white leading-none">15+</div>
                   <div className="text-[10px] font-bold text-sky-400 uppercase tracking-widest mt-2">Years of Excellence</div>
                 </div>
               </div>
@@ -101,7 +125,7 @@ export default function Home() {
             <div className="w-full lg:w-1/2">
               <span className="text-xs font-black text-sky-600 uppercase tracking-[0.3em] mb-4 block">Dedicated Partner</span>
               <h2 className="text-4xl sm:text-6xl font-display font-black text-slate-900 leading-tight mb-8">
-                {lang === 'id' ? 'Mitra Terpercaya Sejak 1998' : 'Your Professional Partner Since 1998'}
+                {lang === 'id' ? 'Mitra Terpercaya Sejak 2011' : 'Your Trusted Partner Since 2011'}
               </h2>
               <div className="space-y-6 text-slate-500 text-lg leading-relaxed mb-12">
                 <p>
