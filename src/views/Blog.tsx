@@ -49,6 +49,9 @@ export default function Blog({ posts }: Props) {
                   alt={lang === 'en' ? post.title_en : post.title_id}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                  decoding="async"
+                  width="800"
+                  height="450"
                 />
               </div>
               <div className="p-8">

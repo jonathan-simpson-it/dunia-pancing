@@ -51,6 +51,10 @@ export default function BlogPostView({ post }: Props) {
               src={post.image}
               alt={lang === 'en' ? post.title_en : post.title_id}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+              width="800"
+              height="450"
             />
           </div>
 

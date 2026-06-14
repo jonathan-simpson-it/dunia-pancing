@@ -40,6 +40,8 @@ export default function RootLayout({
     <html lang="id" className={`${inter.variable} ${plusJakartaSans.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="preconnect" href="https://images.pexels.com" />
+        <link rel="dns-prefetch" href="https://images.pexels.com" />
       </head>
       <body className="bg-slate-50 text-slate-800">
         <Providers>{children}</Providers>

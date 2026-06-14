@@ -5,6 +5,8 @@ import HomePage from '@/views/Home'
 
 export const metadata: Metadata = {
   title: 'Home',
+  description:
+    'Pusat Alat Pancing Terlengkap di Palembang. Joran, Reel, Senar, Kail, Umpan, dan Aksesoris. Melayani Eceran dan Grosir sejak 1998.',
 }
 
 function HomeSkeleton() {

@@ -197,7 +197,7 @@ export default function Home() {
               <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-slate-900/5 rounded-[40px] -z-10" />
               <div className="relative rounded-[40px] overflow-hidden shadow-2xl aspect-4/5">
                 <Image
-                  src="https://images.pexels.com/photos/1143926/pexels-photo-1143926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  src="https://images.pexels.com/photos/1143926/pexels-photo-1143926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&fit=crop"
                   alt="Shop Interior"
                   fill
                   className="object-cover"

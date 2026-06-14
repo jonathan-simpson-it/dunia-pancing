@@ -16,7 +16,7 @@ export default function Hero() {
     <section className="relative overflow-hidden min-h-150 flex items-center">
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://images.pexels.com/photos/2132126/pexels-photo-2132126.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+          src="https://images.pexels.com/photos/2132126/pexels-photo-2132126.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1280&fit=crop"
           alt="Fishing Background"
           fill
           className="object-cover scale-110 blur-[2px] opacity-90"
