@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Blog',
   description: 'Artikel dan tips seputar alat pancing, teknik memancing, dan gaya hidup dari Dunia Pancing Palembang.',
   openGraph: {
-    title: 'Blog — Dunia Pancing Palembang',
+    title: 'Blog | Dunia Pancing Palembang',
     description: 'Artikel dan tips seputar alat pancing, teknik memancing, dan gaya hidup dari Dunia Pancing Palembang.',
   },
 }
