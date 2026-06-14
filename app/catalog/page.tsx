@@ -1,41 +1,37 @@
-import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import CatalogPage from '@/views/Catalog'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Katalog Digital',
+  title: 'Katalog Digital — Coming Soon',
   description:
-    'Katalog digital alat pancing terlengkap di Palembang. Joran, Reel, Senar, Kail, Umpan dan Aksesoris.',
-}
-
-function CatalogFallback() {
-  return (
-    <div className="min-h-screen bg-slate-50 pt-28">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-slate-200 rounded w-48" />
-          <div className="h-4 bg-slate-200 rounded w-96" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mt-8">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-                <div className="aspect-[4/3] bg-slate-200" />
-                <div className="p-3 space-y-2">
-                  <div className="h-3 bg-slate-200 rounded w-3/4" />
-                  <div className="h-4 bg-slate-200 rounded w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+    'Katalog digital alat pancing akan segera hadir. Nikmati kemudahan berbelanja online di Dunia Pancing Palembang.',
 }
 
 export default function Page() {
   return (
-    <Suspense fallback={<CatalogFallback />}>
-      <CatalogPage />
-    </Suspense>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-28 pb-16">
+      <div className="max-w-lg mx-auto px-4 text-center">
+        <div className="w-24 h-24 bg-sky-100 rounded-3xl flex items-center justify-center mx-auto mb-8">
+          <svg className="w-12 h-12 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-display font-black text-slate-900 tracking-tight mb-4">
+          Katalog Digital — Coming Soon
+        </h1>
+        <p className="text-slate-500 text-lg leading-relaxed mb-8">
+          Kami sedang menyiapkan katalog digital terlengkap untuk alat pancing.
+          Nantikan kemudahan berbelanja online dari Dunia Pancing Palembang.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/"
+            className="px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 active:scale-95"
+          >
+            Kembali ke Beranda
+          </Link>
+        </div>
+      </div>
+    </div>
   )
 }
