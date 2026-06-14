@@ -3,9 +3,7 @@
 import { useLang } from '../../context/LanguageContext'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useCart } from '../../context/CartContext'
 import { useAuth } from '../../context/AuthContext'
-import { useSearch } from '../../context/SearchContext'
 import id from '../../locales/id.json'
 import en from '../../locales/en.json'
 
@@ -15,11 +13,8 @@ const t = (key: string, lang: 'id' | 'en'): string => lang === 'id' ? localeId[k
 
 export default function Navbar() {
   const { lang, toggleLang } = useLang()
-  const { itemCount } = useCart()
-  const { isLoggedIn, isAdmin, user, logout } = useAuth()
+  const { isLoggedIn, isAdmin, user } = useAuth()
   const pathname = usePathname()
-  const { searchTerm, setSearchTerm } = useSearch()
-  const isCatalog = pathname === '/catalog'
 
   const links = [
     { to: '/', key: 'nav_home' },
@@ -94,19 +89,6 @@ export default function Navbar() {
             >
               {isLoggedIn ? user?.name : (lang === 'id' ? 'Masuk' : 'Login')}
             </Link>
-            <Link
-              href="/cart"
-              className="relative md:flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-              </svg>
-              {itemCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center shadow px-1">
-                  {itemCount > 99 ? '99+' : itemCount}
-                </span>
-              )}
-            </Link>
 
             <div className="h-6 w-px bg-slate-800 mx-2 hidden md:block" />
 
@@ -120,25 +102,6 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-
-        {isCatalog && (
-          <div className="pb-4">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-4 w-4 text-slate-400 group-focus-within:text-sky-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                value={searchTerm || ''}
-                onChange={e => setSearchTerm(e.target.value)}
-                placeholder={t('nav_search_placeholder', lang)}
-                className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-800/50 text-white placeholder-slate-500 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-sm"
-              />
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   )
