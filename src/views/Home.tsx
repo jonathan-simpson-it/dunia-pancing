@@ -2,6 +2,7 @@
 
 import { useLang } from '../context/LanguageContext'
 import Link from 'next/link'
+import Image from 'next/image'
 import Hero from '../components/ui/Hero'
 import CategoryIcon from '../components/ui/CategoryIcon'
 import { useProducts } from '../context/ProductStore'
@@ -194,11 +195,13 @@ export default function Home() {
             <div className="w-full lg:w-1/2 relative">
               <div className="absolute -top-10 -left-10 w-64 h-64 bg-sky-500/5 rounded-[40px] -z-10 animate-pulse" />
               <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-slate-900/5 rounded-[40px] -z-10" />
-              <div className="relative rounded-[40px] overflow-hidden shadow-2xl">
-                <img 
-                  src="https://images.pexels.com/photos/1143926/pexels-photo-1143926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+              <div className="relative rounded-[40px] overflow-hidden shadow-2xl aspect-4/5">
+                <Image
+                  src="https://images.pexels.com/photos/1143926/pexels-photo-1143926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   alt="Shop Interior"
-                  className="w-full aspect-4/5 object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent" />
                 <div className="absolute bottom-10 left-10">
