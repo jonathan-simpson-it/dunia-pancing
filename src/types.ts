@@ -229,13 +229,17 @@ export interface FormErrors {
 export interface BlogPost {
   id: number
   slug: string
-  title: string
-  excerpt: string
-  content: string
+  title_id: string
+  title_en: string
+  excerpt_id: string
+  excerpt_en: string
+  content_id: string
+  content_en: string
   date: string
   author: string
   image: string
-  category: string
+  category_id: string
+  category_en: string
 }
 
 // ─── Admin Import ──────────────────────────────────────

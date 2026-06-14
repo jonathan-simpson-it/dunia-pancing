@@ -9,6 +9,7 @@ import { formatIDR } from '../utils/formatters'
 import ImageUploader from '../components/ui/ImageUploader'
 import VariantBuilder from '../components/ui/VariantBuilder'
 import FeatureEditor from '../components/ui/FeatureEditor'
+import CategoryIcon from '../components/ui/CategoryIcon'
 import type { Product, VariantType, ProductVariant, ProductFeature } from '../types'
 import id from '../locales/id.json'
 import en from '../locales/en.json'
@@ -118,7 +119,7 @@ export default function AdminDashboard() {
     e.preventDefault()
     setCatError('')
     const key = catForm.key.trim().toLowerCase().replace(/\s+/g, '_')
-    const ok = addCategory({ key, name_id: catForm.name_id.trim(), name_en: catForm.name_en.trim() || catForm.name_id.trim(), icon: catForm.icon.trim() || '📦' })
+    const ok = addCategory({ key, name_id: catForm.name_id.trim(), name_en: catForm.name_en.trim() || catForm.name_id.trim(), icon: catForm.icon.trim() || 'Package' })
     if (!ok) {
       setCatError(lang === 'id' ? 'Kategori dengan key tersebut sudah ada' : 'Category with this key already exists')
       return
@@ -127,7 +128,7 @@ export default function AdminDashboard() {
       await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key, nameId: catForm.name_id.trim(), nameEn: catForm.name_en.trim() || catForm.name_id.trim(), icon: catForm.icon.trim() || '📦' }),
+        body: JSON.stringify({ key, nameId: catForm.name_id.trim(), nameEn: catForm.name_en.trim() || catForm.name_id.trim(), icon: catForm.icon.trim() || 'Package' }),
       })
     } catch (err) {
       console.error('Failed to sync category to DB:', err)
@@ -145,7 +146,7 @@ export default function AdminDashboard() {
     renameCategory(key, {
       name_id: editCatForm.name_id.trim(),
       name_en: editCatForm.name_en.trim() || editCatForm.name_id.trim(),
-      icon: editCatForm.icon.trim() || '📦',
+      icon: editCatForm.icon.trim() || 'Package',
     })
     try {
       await fetch(`/api/categories/${key}`, {
@@ -154,7 +155,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({
           nameId: editCatForm.name_id.trim(),
           nameEn: editCatForm.name_en.trim() || editCatForm.name_id.trim(),
-          icon: editCatForm.icon.trim() || '📦',
+          icon: editCatForm.icon.trim() || 'Package',
         }),
       })
     } catch (err) {
@@ -415,8 +416,8 @@ export default function AdminDashboard() {
                           className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12px] focus:outline-none focus:ring-2 focus:ring-brand-primary/30" />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Icon (emoji)</label>
-                        <input value={catForm.icon} onChange={e => setCatForm({...catForm, icon: e.target.value})} placeholder="🎣"
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">Icon</label>
+                        <input value={catForm.icon} onChange={e => setCatForm({...catForm, icon: e.target.value})} placeholder="FishingRod"
                           className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12px] focus:outline-none focus:ring-2 focus:ring-brand-primary/30" />
                       </div>
                     </div>
@@ -436,7 +437,7 @@ export default function AdminDashboard() {
                   <div className="space-y-2">
                     {categories.map(cat => (
                       <div key={cat.key} className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-xl shrink-0">{cat.icon || '📦'}</span>
+                        <span className="text-xl shrink-0"><CategoryIcon icon={cat.icon} size={24} /></span>
                         {editingCat === cat.key ? (
                           <div className="flex-1 flex flex-wrap items-center gap-2">
                             <input value={editCatForm.name_id} onChange={e => setEditCatForm({...editCatForm, name_id: e.target.value})}
@@ -444,7 +445,7 @@ export default function AdminDashboard() {
                             <input value={editCatForm.name_en} onChange={e => setEditCatForm({...editCatForm, name_en: e.target.value})}
                               className="px-2 py-1 border border-slate-200 rounded text-[12px] w-32" />
                             <input value={editCatForm.icon} onChange={e => setEditCatForm({...editCatForm, icon: e.target.value})}
-                              className="px-2 py-1 border border-slate-200 rounded text-[12px] w-16 text-center" placeholder="🎣" />
+                              className="px-2 py-1 border border-slate-200 rounded text-[12px] w-24 text-center" placeholder="FishingRod" />
                             <button onClick={() => saveEditCat(cat.key)} className="px-3 py-1.5 bg-emerald-500 text-white text-[11px] font-bold rounded-lg hover:bg-emerald-600">{lang === 'id' ? 'Simpan' : 'Save'}</button>
                             <button onClick={() => setEditingCat(null)} className="px-3 py-1.5 text-[11px] font-bold text-slate-400 hover:text-slate-600">{lang === 'id' ? 'Batal' : 'Cancel'}</button>
                           </div>

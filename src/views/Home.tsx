@@ -2,8 +2,10 @@
 
 import { useLang } from '../context/LanguageContext'
 import Link from 'next/link'
-import { useProducts } from '../context/ProductStore'
+import Image from 'next/image'
 import Hero from '../components/ui/Hero'
+import CategoryIcon from '../components/ui/CategoryIcon'
+import { useProducts } from '../context/ProductStore'
 import ProductCard from '../components/ui/ProductCard'
 import id from '../locales/id.json'
 import en from '../locales/en.json'
@@ -21,7 +23,31 @@ export default function Home() {
   return (
     <div className="bg-slate-50">
       <Hero />
-      
+
+      <section className="py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              { number: '28+', label: lang === 'id' ? 'Tahun Pengalaman' : 'Years Experience', desc: lang === 'id' ? 'Melayani pemancing Palembang sejak 1998' : 'Serving Palembang anglers since 1998' },
+              { number: '1000+', label: lang === 'id' ? 'Pelanggan Puas' : 'Happy Customers', desc: lang === 'id' ? 'Toko alat pancing terpercaya' : 'Trusted fishing gear store' },
+              { number: '50+', label: lang === 'id' ? 'Brand Tersedia' : 'Brands Available', desc: lang === 'id' ? 'Dealer resmi brand internasional' : 'Official international brand dealer' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center p-10 bg-slate-50 rounded-4xl border border-slate-100">
+                <div className="text-5xl sm:text-7xl font-display font-black text-sky-600 leading-none mb-3">
+                  {stat.number}
+                </div>
+                <div className="text-sm font-black text-slate-900 uppercase tracking-widest mb-2">
+                  {stat.label}
+                </div>
+                <div className="text-slate-400 text-sm font-medium">
+                  {stat.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-24 max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
           <span className="text-[10px] font-black text-sky-600 bg-sky-50 px-3 py-1 rounded-full uppercase tracking-[0.3em]">
@@ -31,16 +57,16 @@ export default function Home() {
             {t('section_categories', lang)}
           </h2>
         </div>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {categories.map(cat => (
             <Link
               key={cat.key}
-              href={`/catalog?category=${cat.key}`}
+              href="/catalog"
               className="group relative flex flex-col items-center gap-4 p-8 bg-white rounded-4xl border border-slate-100 hover:border-sky-200 transition-all duration-500 hover:shadow-2xl hover:shadow-sky-500/10 hover:-translate-y-2"
             >
               <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-sky-50 group-hover:scale-110 transition-all duration-500">
-                {cat.icon || '📦'}
+                <CategoryIcon icon={cat.icon} size={28} />
               </div>
               <div className="text-center">
                 <span className="block text-sm font-black text-slate-900 group-hover:text-sky-600 transition-colors uppercase tracking-tight">
@@ -69,8 +95,8 @@ export default function Home() {
                 Professional grade equipment tested for performance and durability in Palembang waters.
               </p>
             </div>
-            <Link 
-              href="/catalog" 
+            <Link
+              href="/catalog"
               className="group inline-flex items-center gap-2 text-sky-600 font-black uppercase tracking-widest text-sm hover:text-sky-500 transition-colors"
             >
               Explore Catalog
@@ -105,7 +131,7 @@ export default function Home() {
               </p>
             </div>
             <Link
-              href="/catalog?sort=bestseller"
+              href="/catalog"
               className="group inline-flex items-center gap-2 text-orange-600 font-black uppercase tracking-widest text-sm hover:text-orange-500 transition-colors"
             >
               {lang === 'id' ? 'Lihat Semua' : 'See All'}
@@ -169,15 +195,17 @@ export default function Home() {
             <div className="w-full lg:w-1/2 relative">
               <div className="absolute -top-10 -left-10 w-64 h-64 bg-sky-500/5 rounded-[40px] -z-10 animate-pulse" />
               <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-slate-900/5 rounded-[40px] -z-10" />
-              <div className="relative rounded-[40px] overflow-hidden shadow-2xl">
-                <img 
-                  src="https://images.pexels.com/photos/1143926/pexels-photo-1143926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+              <div className="relative rounded-[40px] overflow-hidden shadow-2xl aspect-4/5">
+                <Image
+                  src="https://images.pexels.com/photos/1143926/pexels-photo-1143926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1575&fit=crop"
                   alt="Shop Interior"
-                  className="w-full aspect-4/5 object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 to-transparent" />
                 <div className="absolute bottom-10 left-10">
-                  <div className="text-4xl font-black text-white leading-none">25+</div>
+                  <div className="text-4xl font-black text-white leading-none">28+</div>
                   <div className="text-[10px] font-bold text-sky-400 uppercase tracking-widest mt-2">Years of Excellence</div>
                 </div>
               </div>
@@ -185,7 +213,7 @@ export default function Home() {
             <div className="w-full lg:w-1/2">
               <span className="text-xs font-black text-sky-600 uppercase tracking-[0.3em] mb-4 block">Dedicated Partner</span>
               <h2 className="text-4xl sm:text-6xl font-display font-black text-slate-900 leading-tight mb-8">
-                {lang === 'id' ? 'Mitra Terpercaya Sejak 1998' : 'Your Professional Partner Since 1998'}
+                {lang === 'id' ? 'Mitra Terpercaya Sejak 1998' : 'Your Trusted Partner Since 1998'}
               </h2>
               <div className="space-y-6 text-slate-500 text-lg leading-relaxed mb-12">
                 <p>
@@ -201,16 +229,10 @@ export default function Home() {
               </div>
               <div className="flex flex-wrap gap-4">
                 <Link 
-                  href="/catalog" 
+                  href="/contact" 
                   className="px-10 py-5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 active:scale-95 text-center"
                 >
-                  Shop Now
-                </Link>
-                <Link 
-                  href="/contact" 
-                  className="px-10 py-5 bg-white text-slate-900 border-2 border-slate-100 font-bold rounded-2xl hover:bg-slate-50 transition-all active:scale-95 text-center"
-                >
-                  {t('nav_contact', lang)}
+                  {lang === 'id' ? 'Hubungi Kami' : 'Contact Us'}
                 </Link>
               </div>
             </div>

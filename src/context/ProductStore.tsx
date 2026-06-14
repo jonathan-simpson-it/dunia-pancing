@@ -36,12 +36,12 @@ const PRODUCTS_KEY = 'dunia-pancing-products'
 const CATEGORIES_KEY = 'dunia-pancing-categories'
 
 const DEFAULT_CATEGORIES: Category[] = [
-  { key: 'rods', name_id: 'Joran', name_en: 'Rods', icon: '🎣' },
-  { key: 'reels', name_id: 'Reel', name_en: 'Reels', icon: '🔄' },
-  { key: 'lines', name_id: 'Senar', name_en: 'Lines', icon: '〰️' },
-  { key: 'hooks', name_id: 'Kail', name_en: 'Hooks', icon: '🪝' },
-  { key: 'lures', name_id: 'Umpan', name_en: 'Lures', icon: '🐟' },
-  { key: 'accessories', name_id: 'Aksesoris', name_en: 'Accessories', icon: '🧰' },
+  { key: 'rods', name_id: 'Joran', name_en: 'Rods', icon: 'FishingRod' },
+  { key: 'reels', name_id: 'Reel', name_en: 'Reels', icon: 'RotateCw' },
+  { key: 'lines', name_id: 'Senar', name_en: 'Lines', icon: 'Minimize' },
+  { key: 'hooks', name_id: 'Kail', name_en: 'Hooks', icon: 'FishingHook' },
+  { key: 'lures', name_id: 'Umpan', name_en: 'Lures', icon: 'Fish' },
+  { key: 'accessories', name_id: 'Aksesoris', name_en: 'Accessories', icon: 'Package' },
 ]
 
 function migrateProduct(p: any): Product {

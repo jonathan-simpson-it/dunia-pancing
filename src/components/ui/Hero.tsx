@@ -1,5 +1,6 @@
 import { useLang } from '../../context/LanguageContext'
 import Link from 'next/link'
+import Image from 'next/image'
 import id from '../../locales/id.json'
 import en from '../../locales/en.json'
 import { SHOPEE_STORE_URL } from '../../utils/shopee'
@@ -14,10 +15,13 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden min-h-150 flex items-center">
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.pexels.com/photos/2132126/pexels-photo-2132126.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+        <Image
+          src="https://images.pexels.com/photos/2132126/pexels-photo-2132126.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1280&fit=crop"
           alt="Fishing Background"
-          className="w-full h-full object-cover scale-110 blur-[2px] opacity-90"
+          fill
+          className="object-cover scale-110 blur-[2px] opacity-90"
+          priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-900/90 to-slate-900/40" />
       </div>
@@ -61,7 +65,7 @@ export default function Hero() {
             {[
               { label: 'Products', val: '2k+' },
               { label: 'Customers', val: '10k+' },
-              { label: 'Experience', val: '15y' }
+              { label: 'Experience', val: '28y' }
             ].map(stat => (
               <div key={stat.label}>
                 <div className="text-2xl font-black text-white">{stat.val}</div>

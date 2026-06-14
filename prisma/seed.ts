@@ -50,12 +50,12 @@ async function main() {
   })
 
   const categories = [
-    { key: 'reel', nameId: 'Reel', nameEn: 'Reel', icon: '🎣' },
-    { key: 'rod', nameId: 'Joran', nameEn: 'Fishing Rod', icon: '🎯' },
-    { key: 'line', nameId: 'Senar', nameEn: 'Fishing Line', icon: '〰️' },
-    { key: 'lure', nameId: 'Umpan', nameEn: 'Lure & Bait', icon: '🦐' },
-    { key: 'tool', nameId: 'Alat', nameEn: 'Tools', icon: '🔧' },
-    { key: 'accessory', nameId: 'Aksesoris', nameEn: 'Accessories', icon: '🧢' },
+    { key: 'reel', nameId: 'Reel', nameEn: 'Reel', icon: 'RotateCw' },
+    { key: 'rod', nameId: 'Joran', nameEn: 'Fishing Rod', icon: 'FishingRod' },
+    { key: 'line', nameId: 'Senar', nameEn: 'Fishing Line', icon: 'Minimize' },
+    { key: 'lure', nameId: 'Umpan', nameEn: 'Lure & Bait', icon: 'Fish' },
+    { key: 'tool', nameId: 'Alat', nameEn: 'Tools', icon: 'Wrench' },
+    { key: 'accessory', nameId: 'Aksesoris', nameEn: 'Accessories', icon: 'Package' },
   ]
 
   for (const cat of categories) {
