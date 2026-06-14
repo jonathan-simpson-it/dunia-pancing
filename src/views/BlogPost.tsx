@@ -26,15 +26,15 @@ export default function BlogPostView({ post }: Props) {
             <span className="text-slate-700">/</span>
             <Link href="/blog" className="hover:text-white transition-colors">{t('nav_blog', lang)}</Link>
             <span className="text-slate-700">/</span>
-            <span className="text-sky-400">{post.title}</span>
+            <span className="text-sky-400">{lang === 'en' ? post.title_en : post.title_id}</span>
           </nav>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-[10px] font-black uppercase tracking-widest text-sky-400 bg-sky-500/10 px-3 py-1.5 rounded-full">
-              {post.category}
+              {lang === 'en' ? post.category_en : post.category_id}
             </span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-display font-black text-white tracking-tight leading-tight">
-            {post.title}
+            {lang === 'en' ? post.title_en : post.title_id}
           </h1>
           <div className="flex items-center gap-4 mt-6 text-sm text-slate-400 font-medium">
             <span>{t('blog_by', lang)} {post.author}</span>
@@ -55,7 +55,7 @@ export default function BlogPostView({ post }: Props) {
           </div>
 
           <div className="prose prose-slate max-w-none">
-            {post.content.split('\n').map((line, i) => {
+            {(lang === 'en' ? post.content_en : post.content_id).split('\n').map((line, i) => {
               if (line.startsWith('## ')) {
                 return (
                   <h2 key={i} className="text-2xl font-black text-slate-900 mt-12 mb-6 tracking-tight">

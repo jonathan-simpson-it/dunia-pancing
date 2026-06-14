@@ -53,15 +53,15 @@ export default function Blog({ posts }: Props) {
               <div className="p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 bg-sky-50 px-3 py-1.5 rounded-full">
-                    {post.category}
+                    {lang === 'en' ? post.category_en : post.category_id}
                   </span>
                   <span className="text-[10px] font-bold text-slate-400">{post.date}</span>
                 </div>
                 <h2 className="text-xl font-black text-slate-900 group-hover:text-sky-600 transition-colors tracking-tight mb-3">
-                  {post.title}
+                  {lang === 'en' ? post.title_en : post.title_id}
                 </h2>
                 <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-3">
-                  {post.excerpt}
+                  {lang === 'en' ? post.excerpt_en : post.excerpt_id}
                 </p>
                 <div className="mt-6 flex items-center gap-2 text-sm font-bold text-sky-600 group-hover:gap-3 transition-all">
                   <span>{t('blog_read_more', lang)}</span>
