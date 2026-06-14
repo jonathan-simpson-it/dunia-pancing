@@ -125,7 +125,7 @@ export default function Home() {
             <div className="w-full lg:w-1/2">
               <span className="text-xs font-black text-sky-600 uppercase tracking-[0.3em] mb-4 block">Dedicated Partner</span>
               <h2 className="text-4xl sm:text-6xl font-display font-black text-slate-900 leading-tight mb-8">
-                {lang === 'id' ? 'Mitra Terpercaya Sejak 2011' : 'Your Trusted Partner Since 2011'}
+                {lang === 'id' ? 'Mitra Terpercaya Sejak 1998' : 'Your Trusted Partner Since 1998'}
               </h2>
               <div className="space-y-6 text-slate-500 text-lg leading-relaxed mb-12">
                 <p>
